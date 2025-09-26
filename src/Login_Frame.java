@@ -1,9 +1,6 @@
-import javax.swing.*;
 import java.awt.*;
-import java.io.InputStream;
-import java.math.BigDecimal;
 import java.sql.*;
-import java.util.HashMap;
+import javax.swing.*;
 
 public class Login_Frame extends JFrame {
 
