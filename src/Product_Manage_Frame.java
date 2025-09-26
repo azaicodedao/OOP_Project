@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-
+//Nguyễn Văn Tiến
 public class Product_Manage_Frame extends JFrame {
 
     Product_Manage_Frame(){

@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-
+// Nguyễn Trung Nghĩa
 public class Home_Frame extends JFrame{
 
     JButton qlspButton, tao_gio_hangButton, dangxuatButton, exitButton;
