@@ -1,6 +1,6 @@
+import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
-import javax.swing.*;
 
 public class Login_Frame extends JFrame {
 
