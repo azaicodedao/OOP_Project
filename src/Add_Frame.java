@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
-
+//Nguyễn Trung Nghĩa
 public class Add_Frame extends JFrame{
 
     JPanel panel = new JPanel(new GridBagLayout());

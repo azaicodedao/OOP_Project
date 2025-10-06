@@ -1,7 +1,7 @@
-import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
-
+import javax.swing.*;
+// Nguyễn Trung Nghĩa
 public class Login_Frame extends JFrame {
 
     JButton loginButton = new JButton("Đăng Nhập");
