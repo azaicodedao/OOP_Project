@@ -91,7 +91,7 @@ public class Product_Manage_Frame extends JFrame {
     }
     private void LoadTable(){
         model.setRowCount(0);
-        ArrayList<Product> list = Product_DataAccessObject.getAll();
+        ArrayList<Product> list = ProductDAO.getAll();
         for(Product p : list){
             if(p.getSoluong() <= 10){
                 JOptionPane.showMessageDialog(this,"⚠️ Sản phẩm \"" + p.getTenSP() + "\" sắp hết hàng!\n(Số lượng còn: " + p.getSoluong() + ")",
@@ -103,7 +103,7 @@ public class Product_Manage_Frame extends JFrame {
     private void Search_Product(){
         String key = txt_Search.getText().toLowerCase();
         model.setRowCount(0);
-        ArrayList<Product> list = Product_DataAccessObject.getAll();
+        ArrayList<Product> list = ProductDAO.getAll();
         for(Product p : list){
             if(p.getMaSP().toLowerCase().contains(key) || p.getTenSP().toLowerCase().contains(key)){
                 model.addRow(new Object[]{p.getId(),p.getMaSP(),p.getTenSP(), p.getDonvi(),p.getGia(),p.getSoluong()});
@@ -122,7 +122,7 @@ public class Product_Manage_Frame extends JFrame {
             Product sp = new Product(id, maSP, tenSP, donvi, gia, soluong);
 
             // Update DB
-            boolean ok = Product_DataAccessObject.update(sp);
+            boolean ok = ProductDAO.update(sp);
             if (!ok){
                 JOptionPane.showMessageDialog(this,"Cập nhật thất bại!");
             }
@@ -142,7 +142,7 @@ public class Product_Manage_Frame extends JFrame {
             int confirm = JOptionPane.showConfirmDialog(this,"Bạn có chắc xóa sản phẩm này không?","Cảnh báo!",JOptionPane.YES_NO_OPTION);
             if(confirm==JOptionPane.YES_OPTION) {
                 int id = (int) model.getValueAt(row, 0);
-                if (Product_DataAccessObject.delete(id)) {
+                if (ProductDAO.delete(id)) {
                     model.removeRow(row);
                     JOptionPane.showMessageDialog(this, "Xóa thành công!");
                 }

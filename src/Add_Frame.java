@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
-//Nguyễn Trung Nghĩa
+
 public class Add_Frame extends JFrame{
 
     JPanel panel = new JPanel(new GridBagLayout());
@@ -98,7 +98,7 @@ public class Add_Frame extends JFrame{
             String soluongStr = TextField.getText().trim();
 
             if(maSP.isEmpty() || ten.isEmpty() || donvi.isEmpty() || giaStr.isEmpty() || soluongStr.isEmpty()){
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!");
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -109,12 +109,12 @@ public class Add_Frame extends JFrame{
                 soluong = Integer.parseInt(soluongStr);
             }
             catch(NumberFormatException ex){
-                JOptionPane.showMessageDialog(this, "Giá và số lượng phải là số hợp lệ!");
+                JOptionPane.showMessageDialog(this, "Giá và số lượng phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             if(insertProduct(maSP, ten, donvi, gia, soluong)){
-                JOptionPane.showMessageDialog(this, "Thêm sản phẩm thành công!");
+                JOptionPane.showMessageDialog(this, "Thêm sản phẩm thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                 MaSPTextField.setText("");
                 TenSPTextField.setText("");
                 DonViTextField.setText("");
@@ -122,7 +122,7 @@ public class Add_Frame extends JFrame{
                 TextField.setText("");
             }
             else{
-                JOptionPane.showMessageDialog(this, "Thêm sản phẩm thất bại!");
+                JOptionPane.showMessageDialog(this, "Sản phẩm đã tồn tại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -133,33 +133,8 @@ public class Add_Frame extends JFrame{
     }
 
     private boolean insertProduct(String maSP, String ten, String donvi, double gia, int soluong){
-        String checkSql = "SELECT 1 FROM sanpham WHERE ten = ?";
-        String insertSql = "INSERT INTO sanpham(maSP, ten, donvi, gia, soluong) VALUES(?,?,?,?,?)";
-
-        try(Connection con = Database_Connection.getConnection()){
-            try(PreparedStatement checkStmt = con.prepareStatement(checkSql)){
-                checkStmt.setString(1, ten);
-                ResultSet rs = checkStmt.executeQuery();
-                if(rs.next()){
-                    JOptionPane.showMessageDialog(this, "Sản phẩm đã tồn tại!");
-                    return false;
-                }
-            }
-
-            try(PreparedStatement pstmt = con.prepareStatement(insertSql)){
-                pstmt.setString(1, maSP);
-                pstmt.setString(2, ten);
-                pstmt.setString(3, donvi);
-                pstmt.setDouble(4, gia);
-                pstmt.setInt(5, soluong);
-                pstmt.executeUpdate();
-                return true;
-            }
-        }
-        catch(SQLException e){
-            e.printStackTrace();
-            return false;
-        }
+        ProductService productService = new ProductService();
+        return productService.addProduct(maSP, ten, donvi, gia, soluong);
     }
 
     public static void main(String[] args) throws Exception{
