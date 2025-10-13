@@ -1,21 +1,25 @@
 package UI;
 
+import UI.ImportUI.Import_List_Frame;
+import UI.InvoiceUI.Invoice_Create_Frame;
+import UI.InvoiceUI.Invoice_List_Frame;
 import UI.ProductUI.Product_Manage_Frame;
 
 import javax.swing.*;
 import java.awt.*;
+
 // Nguyễn Trung Nghĩa
 public class Home_Frame extends JFrame{
 
-    JButton qlspButton, tao_gio_hangButton, dangxuatButton, exitButton;
-    JLabel titleLabel, footerLabel;
+    JButton qlspButton, tao_gio_hangButton, btn_Import_List, btn_Invoice_List, exitButton;
+    JLabel title, footerLabel;
     JPanel panel;
 
     Home_Frame(){
 
-        titleLabel = new JLabel("PHẦN MỀM QUẢN LÝ BÁN HÀNG", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Poppins", Font.BOLD, 40));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(50, 0, 10, 0));
+        title = new JLabel("PHẦN MỀM QUẢN LÝ BÁN HÀNG", SwingConstants.CENTER);
+        title.setFont(new Font("Poppins", Font.BOLD, 40));
+        title.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
 
         footerLabel = new JLabel("© 2025 - Demo", SwingConstants.CENTER);
         footerLabel.setFont(new Font("Poppins", Font.BOLD, 15));
@@ -34,23 +38,9 @@ public class Home_Frame extends JFrame{
         qlspButton.add(iconLabel1, BorderLayout.WEST);
         qlspButton.add(textLabel1, BorderLayout.CENTER);
 
-        qlspButton.setPreferredSize(new Dimension(250, 50));
+        qlspButton.setPreferredSize(new Dimension(250, 60));
         qlspButton.setFocusable(false);
-        qlspButton.addActionListener(e ->{
-            dispose();
-            try {
-                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-                new Product_Manage_Frame();
-            } catch (ClassNotFoundException ex) {
-                throw new RuntimeException(ex);
-            } catch (InstantiationException ex) {
-                throw new RuntimeException(ex);
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            } catch (UnsupportedLookAndFeelException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+        qlspButton.addActionListener(e -> qlsp());
 
         // --------------------- qlspButton ---------------------
 
@@ -67,85 +57,142 @@ public class Home_Frame extends JFrame{
         tao_gio_hangButton.add(iconLabel2, BorderLayout.WEST);
         tao_gio_hangButton.add(textLabel2, BorderLayout.CENTER);
 
-        tao_gio_hangButton.setPreferredSize(new Dimension(250, 50));
+        tao_gio_hangButton.setPreferredSize(new Dimension(250, 60));
         tao_gio_hangButton.setFocusable(false);
+        tao_gio_hangButton.addActionListener(e -> tao_gio_hang());
 
         // --------------------- tao_gio_hangButton ---------------------
 
-        // --------------------- dangxuatButton ---------------------
+        // --------------------- btn_Import_List ---------------------
 
-        dangxuatButton = new JButton();
-        dangxuatButton.setLayout(new BorderLayout());
+        btn_Import_List = new JButton();
+        btn_Import_List.setLayout(new BorderLayout());
 
-        JLabel iconLabel4 = new JLabel(new ImageIcon("image/logout.png"));
+        JLabel iconLabel3 = new JLabel(new ImageIcon("image/import.png"));
+        iconLabel3.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+        JLabel textLabel3 = new JLabel("Danh sách phiếu nhập", SwingConstants.CENTER); // Sửa text
+        textLabel3.setFont(new Font("Inter", Font.BOLD, 30));
+
+        btn_Import_List.add(iconLabel3, BorderLayout.WEST);
+        btn_Import_List.add(textLabel3, BorderLayout.CENTER);
+
+        btn_Import_List.setPreferredSize(new Dimension(250, 60));
+        btn_Import_List.setFocusable(false);
+        btn_Import_List.addActionListener(e -> Import_List());
+
+        // --------------------- btn_Import_List ---------------------
+
+        // --------------------- btn_Invoice_List ---------------------
+
+        btn_Invoice_List = new JButton();
+        btn_Invoice_List.setLayout(new BorderLayout());
+
+        JLabel iconLabel4 = new JLabel(new ImageIcon("image/invoice.png"));
         iconLabel4.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
-        JLabel textLabel4 = new JLabel("Đăng xuất", SwingConstants.CENTER);
+        JLabel textLabel4 = new JLabel("Danh sách hóa đơn", SwingConstants.CENTER); // Sửa text
         textLabel4.setFont(new Font("Inter", Font.BOLD, 30));
 
-        dangxuatButton.add(iconLabel4, BorderLayout.WEST);
-        dangxuatButton.add(textLabel4, BorderLayout.CENTER);
+        btn_Invoice_List.add(iconLabel4, BorderLayout.WEST);
+        btn_Invoice_List.add(textLabel4, BorderLayout.CENTER);
 
-        dangxuatButton.setPreferredSize(new Dimension(250, 50));
-        dangxuatButton.setFocusable(false);
-        dangxuatButton.addActionListener(e ->{
-            dispose();
-            try {
-                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-                new Login_Frame();
-            } catch (ClassNotFoundException ex) {
-                throw new RuntimeException(ex);
-            } catch (InstantiationException ex) {
-                throw new RuntimeException(ex);
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            } catch (UnsupportedLookAndFeelException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+        btn_Invoice_List.setPreferredSize(new Dimension(250, 60));
+        btn_Invoice_List.setFocusable(false);
+        btn_Invoice_List.addActionListener(e -> Invoice_List());
 
-        // --------------------- dangxuatButton ---------------------
+        // --------------------- btn_Invoice_List ---------------------
 
         // --------------------- exitButton ---------------------
 
         exitButton = new JButton();
         exitButton.setLayout(new BorderLayout());
 
-        JLabel iconLabel3 = new JLabel(new ImageIcon("image/exit.png"));
-        iconLabel3.setBorder(BorderFactory.createEmptyBorder(0, 18, 0, 0));
-        JLabel textLabel3 = new JLabel("Thoát", SwingConstants.CENTER);
-        textLabel3.setFont(new Font("Inter", Font.BOLD, 30));
+        JLabel iconLabel5 = new JLabel(new ImageIcon("image/exit.png"));
+        iconLabel5.setBorder(BorderFactory.createEmptyBorder(0, 18, 0, 0));
+        JLabel textLabel5 = new JLabel("Thoát", SwingConstants.CENTER);
+        textLabel5.setFont(new Font("Inter", Font.BOLD, 30));
 
-        exitButton.add(iconLabel3, BorderLayout.WEST);
-        exitButton.add(textLabel3, BorderLayout.CENTER);
+        exitButton.add(iconLabel5, BorderLayout.WEST);
+        exitButton.add(textLabel5, BorderLayout.CENTER);
 
-        exitButton.setPreferredSize(new Dimension(250, 50));
+        exitButton.setPreferredSize(new Dimension(250, 60));
         exitButton.setFocusable(false);
-
-        exitButton.addActionListener(e -> {
-            System.exit(0);
-        });
+        exitButton.addActionListener(e -> exit());
 
         // --------------------- exitButton ---------------------
 
         panel = new JPanel();
         panel.setBackground(new Color(0xE0F2F1));
         panel.setOpaque(true);
-        panel.setLayout(new GridLayout(4, 1, 5, 5));
-        panel.setBorder(BorderFactory.createEmptyBorder(40, 200, 40, 200));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 200, 20, 200));
+
         panel.add(qlspButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 5)));
         panel.add(tao_gio_hangButton);
-        panel.add(dangxuatButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        panel.add(btn_Import_List);
+        panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        panel.add(btn_Invoice_List);
+        panel.add(Box.createRigidArea(new Dimension(0, 5)));
         panel.add(exitButton);
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("PHẦN MỀM QUẢN LÝ BÁN HÀNG");
-        setSize(800, 600);
+        setSize(900, 600);
         getContentPane().setBackground(new Color(0xE0F2F1));
         setLayout(new BorderLayout());
-        add(titleLabel, BorderLayout.NORTH);
+        add(title, BorderLayout.NORTH);
         add(panel, BorderLayout.CENTER);
         add(footerLabel, BorderLayout.SOUTH);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private void qlsp(){
+        dispose();
+        try{
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            new Product_Manage_Frame();
+        } catch (Exception e){
+            System.out.println("Chuyển frame sang qlsp bị lỗi");
+        }
+    }
+
+    private void tao_gio_hang(){
+        dispose();
+        try{
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            new Invoice_Create_Frame();
+        } catch (Exception e){
+            System.out.println("Chuyển frame sang tạo giỏ hàng bị lỗi");
+        }
+    }
+
+    private void Import_List(){
+        dispose();
+        try{
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            new Import_List_Frame();
+        } catch (Exception e){
+            System.out.println("Chuyển frame sang xem danh sách phiếu nhập bị lỗi");
+        }
+    }
+
+    private void Invoice_List(){
+        dispose();
+        try{
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            new Invoice_List_Frame();
+        } catch (Exception e){
+            System.out.println("Chuyển frame sang xem danh sách hóa đơn bị lỗi");
+        }
+    }
+
+    private void exit(){
+        int result = JOptionPane.showConfirmDialog(this,
+                "Bạn có muốn thoát không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
     }
 }
