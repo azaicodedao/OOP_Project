@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 // Nguyễn Trung Nghĩa
+
 public class Home_Frame extends JFrame{
 
     JButton qlspButton, tao_gio_hangButton, btn_Import_List, btn_Invoice_List, exitButton;
