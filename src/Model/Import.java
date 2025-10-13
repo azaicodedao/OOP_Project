@@ -7,7 +7,7 @@ public class Import {
     private final double total;
     private final LocalDateTime ngayNhap;
 
-    public Import(int id, double total, LocalDateTime ngayNhap){
+    public Import(double total, LocalDateTime ngayNhap){
         this.total = total;
         this.ngayNhap = ngayNhap;
     }
