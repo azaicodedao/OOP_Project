@@ -2,6 +2,8 @@ package Model;
 
 import java.time.LocalDateTime;
 
+// Nguyễn Trung Nghĩa
+
 public class Import {
     private int id;
     private final double total;
