@@ -23,7 +23,7 @@ public class Import_List_Frame extends JFrame{
         importService = new Import_Service();
         // Tiêu đề
         JLabel titleLabel = new JLabel("DANH SÁCH PHIẾU NHẬP", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Poppins", Font.BOLD, 30));
+        titleLabel.setFont(new Font("Poppins", Font.BOLD, 40));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
 
         // Tạo model cho bảng với 3 cột
@@ -37,19 +37,20 @@ public class Import_List_Frame extends JFrame{
 
         // JTable để hiển thị dữ liệu dạng bảng
         importTable = new JTable(tableModel);
-        importTable.setFont(new Font("Inter", Font.PLAIN, 14));
+        importTable.setFont(new Font("Inter", Font.PLAIN, 16));
         importTable.setForeground(new Color(0x333333));
-        importTable.setRowHeight(35);
+        importTable.setRowHeight(40);
         importTable.setSelectionBackground(new Color(0xBEE3F8));
         importTable.setSelectionForeground(Color.BLACK);
-        importTable.getTableHeader().setFont(new Font("Inter", Font.BOLD, 14));
+        importTable.getTableHeader().setFont(new Font("Inter", Font.BOLD, 16));
         importTable.getTableHeader().setBackground(new Color(0xDCE6F1));
         importTable.getTableHeader().setForeground(new Color(0x333333));
+        ((DefaultTableCellRenderer) importTable.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(JLabel.CENTER);
 
         // Căn chỉnh độ rộng cột
-        importTable.getColumnModel().getColumn(0).setPreferredWidth(80);
-        importTable.getColumnModel().getColumn(1).setPreferredWidth(150);
-        importTable.getColumnModel().getColumn(2).setPreferredWidth(150);
+        importTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+        importTable.getColumnModel().getColumn(1).setPreferredWidth(200);
+        importTable.getColumnModel().getColumn(2).setPreferredWidth(200);
 
         // Căn giữa hoặc phải cho các cột
         importTable.getColumnModel().getColumn(0).setCellRenderer(new CenterRenderer());
@@ -70,12 +71,15 @@ public class Import_List_Frame extends JFrame{
         });
 
         JScrollPane scrollPane = new JScrollPane(importTable);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        scrollPane.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(10, 40, 10, 40), // khoảng cách xung quanh
+                BorderFactory.createLineBorder(new Color(0xA7B1B7), 2, true) // viền mờ quanh bảng
+        ));
 
         // Tạo panel cho nút
-        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         buttonPanel.setBackground(new Color(0xE0F2F1));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
 
         backButton = createStyledButton("Quay lại");
         backButton.addActionListener(e -> goBack());
@@ -96,7 +100,7 @@ public class Import_List_Frame extends JFrame{
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Quản lý phiếu nhập");
-        setSize(600, 500);
+        setSize(900, 600);
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(0xE0F2F1));
         setVisible(true);
@@ -104,8 +108,8 @@ public class Import_List_Frame extends JFrame{
 
     private JButton createStyledButton(String text){
         JButton button = new JButton(text);
-        button.setFont(new Font("Inter", Font.BOLD, 14));
-        button.setPreferredSize(new Dimension(120, 35));
+        button.setFont(new Font("Inter", Font.BOLD, 20));
+        button.setPreferredSize(new Dimension(140, 50));
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
 
@@ -187,15 +191,15 @@ public class Import_List_Frame extends JFrame{
             return c;
         }
     }
-//
-//    public static void main(String[] args){
-//        SwingUtilities.invokeLater(() ->{
-//            try{
-//                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-//            } catch(Exception e){
-//                e.printStackTrace();
-//            }
-//            new Import_List_Frame();
-//        });
-//    }
+
+    public static void main(String[] args){
+        SwingUtilities.invokeLater(() ->{
+            try{
+                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+            new Import_List_Frame();
+        });
+    }
 }
