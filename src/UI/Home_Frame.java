@@ -15,7 +15,7 @@ public class Home_Frame extends JFrame{
     JLabel title, footerLabel;
     JPanel panel;
 
-    Home_Frame(){
+    public Home_Frame(){
 
         title = new JLabel("PHẦN MỀM QUẢN LÝ BÁN HÀNG", SwingConstants.CENTER);
         title.setFont(new Font("Poppins", Font.BOLD, 40));
