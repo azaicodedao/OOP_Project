@@ -72,8 +72,8 @@ public class Import_List_Frame extends JFrame{
 
         JScrollPane scrollPane = new JScrollPane(importTable);
         scrollPane.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(10, 40, 10, 40), // khoảng cách xung quanh
-                BorderFactory.createLineBorder(new Color(0xA7B1B7), 2, true) // viền mờ quanh bảng
+                BorderFactory.createEmptyBorder(10, 40, 10, 40),
+                BorderFactory.createLineBorder(new Color(0xA7B1B7), 2, true)
         ));
 
         // Tạo panel cho nút
