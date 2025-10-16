@@ -6,6 +6,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import DAO.Service.ImportSEV.Import_Service;
 import Model.Import;
@@ -16,7 +18,8 @@ import UI.Home_Frame;
 public class Import_List_Frame extends JFrame{
     private final JTable importTable;
     private final DefaultTableModel tableModel;
-    private final JButton backButton, refreshButton;
+    private final JButton backButton, refreshButton, filterButton;
+    private final JTextField fromDateField, toDateField;
     private final Import_Service importService;
     private List<Import> importList;
 
@@ -26,7 +29,42 @@ public class Import_List_Frame extends JFrame{
         // Tiêu đề
         JLabel titleLabel = new JLabel("DANH SÁCH PHIẾU NHẬP", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Poppins", Font.BOLD, 40));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
+
+        // Panel lọc ngày
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        filterPanel.setBackground(new Color(0xE0F2F1));
+
+        JLabel fromLabel = new JLabel("Từ ngày:");
+        fromLabel.setFont(new Font("Inter", Font.PLAIN, 16));
+        fromDateField = new JTextField();
+        fromDateField.setFont(new Font("Inter", Font.PLAIN, 16));
+        fromDateField.setPreferredSize(new Dimension(120, 30));
+
+        JLabel toLabel = new JLabel("Đến ngày:");
+        toLabel.setFont(new Font("Inter", Font.PLAIN, 16));
+        toDateField = new JTextField();
+        toDateField.setFont(new Font("Inter", Font.PLAIN, 16));
+        toDateField.setPreferredSize(new Dimension(120, 30));
+
+        filterButton = createStyledButton("Lọc", new Dimension(100, 35));
+        filterButton.setFont(new Font("Inter", Font.BOLD, 16));
+        filterButton.addActionListener(e -> filterByDateRange());
+
+        JButton clearFilterButton = createStyledButton("Xóa lọc", new Dimension(100, 35));
+        clearFilterButton.setFont(new Font("Inter", Font.BOLD, 16));
+        clearFilterButton.addActionListener(e -> {
+            fromDateField.setText("");
+            toDateField.setText("");
+            loadImportData();
+        });
+
+        filterPanel.add(fromLabel);
+        filterPanel.add(fromDateField);
+        filterPanel.add(toLabel);
+        filterPanel.add(toDateField);
+        filterPanel.add(filterButton);
+        filterPanel.add(clearFilterButton);
 
         // Tạo model cho bảng với 3 cột
         String[] columns ={"ID", "Tổng tiền", "Ngày nhập"};
@@ -83,10 +121,10 @@ public class Import_List_Frame extends JFrame{
         buttonPanel.setBackground(new Color(0xE0F2F1));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
 
-        backButton = createStyledButton("Quay lại");
+        backButton = createStyledButton("Quay lại", new Dimension(140, 50));
         backButton.addActionListener(e -> goBack());
 
-        refreshButton = createStyledButton("Làm mới");
+        refreshButton = createStyledButton("Làm mới", new Dimension(140, 50));
         refreshButton.addActionListener(e -> loadImportData());
 
         buttonPanel.add(backButton);
@@ -95,27 +133,98 @@ public class Import_List_Frame extends JFrame{
         // Layout chính
         setLayout(new BorderLayout());
         add(titleLabel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
+        add(filterPanel, BorderLayout.CENTER); // Đặt filterPanel ở giữa
+        add(scrollPane, BorderLayout.CENTER); // ScrollPane sẽ chiếm phần còn lại
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        // Sửa lại layout để filterPanel nằm trên scrollPane
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(filterPanel, BorderLayout.NORTH);
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
+        centerPanel.setBackground(new Color(0xE0F2F1));
+
+        setLayout(new BorderLayout());
+        add(titleLabel, BorderLayout.NORTH);
+        add(centerPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
         loadImportData();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Quản lý phiếu nhập");
-        setSize(900, 600);
+        setSize(900, 650);
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(0xE0F2F1));
         setVisible(true);
     }
 
-    private JButton createStyledButton(String text){
+    private JButton createStyledButton(String text, Dimension size){
         JButton button = new JButton(text);
-        button.setFont(new Font("Inter", Font.BOLD, 20));
-        button.setPreferredSize(new Dimension(140, 50));
+        button.setFont(new Font("Inter", Font.BOLD, size.height == 50 ? 20 : 14));
+        button.setPreferredSize(size);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-
         return button;
+    }
+
+    // Lọc theo khoảng ngày
+    private void filterByDateRange() {
+        String from = fromDateField.getText().trim();
+        String to = toDateField.getText().trim();
+
+        if (from.isEmpty() || to.isEmpty()) {
+            UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String fromDB;
+        String toDB;
+
+        // Validate định dạng ngày
+        DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter dbFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            // Parse theo định dạng hiển thị (dd/MM/yyyy)
+            LocalDate fromDate = LocalDate.parse(from, displayFormatter);
+            LocalDate toDate = LocalDate.parse(to, displayFormatter);
+
+            // Chuyển sang định dạng database (yyyy-MM-dd)
+            fromDB = fromDate.format(dbFormatter);
+            toDB = toDate.format(dbFormatter);
+
+        } catch (Exception e) {
+            UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
+            JOptionPane.showMessageDialog(this, "Định dạng ngày không hợp lệ! Vui lòng sử dụng định dạng dd/MM/yyyy", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        tableModel.setRowCount(0);
+
+        try {
+            importList = importService.getByDateRange(fromDB, toDB);
+
+            if (importList.isEmpty()) {
+                UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
+                JOptionPane.showMessageDialog(this, "Không có phiếu nhập nào trong khoảng thời gian này!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            for (Import importItem : importList) {
+                String formattedTotal = String.format("%,.0f VNĐ", importItem.getTotal());
+                String formattedDate = importItem.getNgayNhap().toString();
+
+                tableModel.addRow(new Object[]{importItem.getId(), formattedTotal, formattedDate});
+            }
+
+            UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
+            JOptionPane.showMessageDialog(this, "Đã tìm thấy " + importList.size() + " phiếu nhập", "Kết quả lọc", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+            UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
+            JOptionPane.showMessageDialog(this, "Lỗi khi lọc dữ liệu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Lỗi khi lọc dữ liệu: " + e.getMessage());
+        }
     }
 
     private void loadImportData(){
