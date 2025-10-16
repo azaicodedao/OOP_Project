@@ -125,6 +125,7 @@ public class Import_List_Frame extends JFrame{
             importList = importService.getAll();
 
             if(importList.isEmpty()){
+                UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16)); // Căn chỉnh font chữ OptionPane
                 JOptionPane.showMessageDialog(this, "Không có phiếu nhập nào!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
@@ -137,6 +138,7 @@ public class Import_List_Frame extends JFrame{
             }
 
         } catch(Exception e){
+            UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
             JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             System.out.println("Lỗi khi tải dữ liệu");
         }
@@ -155,6 +157,7 @@ public class Import_List_Frame extends JFrame{
         try{
             new Home_Frame();
         } catch(Exception e){
+            UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
             JOptionPane.showMessageDialog(this, "Lỗi khi quay lại: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             System.out.println("Lỗi khi quay về Home_Frame");
         }
