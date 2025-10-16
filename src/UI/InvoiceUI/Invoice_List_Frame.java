@@ -11,7 +11,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class Invoice_List_Frame extends javax.swing.JFrame {
+public class
+Invoice_List_Frame extends javax.swing.JFrame {
     private DefaultTableModel model;
     private JTable table;
     private JButton btn_Refresh, btn_Back;
