@@ -116,6 +116,11 @@ public class Product_Manage_Frame extends JFrame {
         }
     }
 
+    // Load lại bảng khi thêm sản phẩm xong
+    public void refreshTable() {
+        LoadTable();
+    }
+
     private void Search_Product() {
         String key = txt_Search.getText().toLowerCase();
         model.setRowCount(0);
@@ -150,8 +155,9 @@ public class Product_Manage_Frame extends JFrame {
         }
     }
 
+    // Thêm parent vào Add_Frame để dữ liệu được cập nhật real-time
     private void Add_Product() {
-        Add_Frame add_frame = new Add_Frame();
+        Add_Frame add_frame = new Add_Frame(this);
         add_frame.setVisible(true);
     }
 
