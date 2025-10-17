@@ -14,7 +14,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -106,8 +107,9 @@ Invoice_List_Frame extends javax.swing.JFrame {
         model.setRowCount(0);
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         try {
+            // Lấy dữ liệu từ DateChooser
             Date fromDate = date_from.getDate();
             Date toDate = date_to.getDate();
 
@@ -127,11 +129,11 @@ Invoice_List_Frame extends javax.swing.JFrame {
                 return;
             }
 
-//            Chuyen sang LocalDate
-            LocalDate from = fromDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
-            LocalDate to = toDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+//            Chuyen sang LocalDateTime
+            LocalDateTime from = fromDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().atStartOfDay();
+            LocalDateTime to = toDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().atTime(23, 59, 59);
 
-            ArrayList<Invoice> invoices = invoice_service.getByDateRange(from.toString(), to.toString());
+            ArrayList<Invoice> invoices = invoice_service.getByDateRange(from.format(formatter), to.format(formatter));
             for (Invoice i : invoices) {
                 model.addRow(new Object[]{
                         i.getId(),

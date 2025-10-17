@@ -31,18 +31,19 @@ public class Invoice_Service {
     }
     public ArrayList<Invoice> getByDateRange(String from, String to){
         ArrayList<Invoice> list = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String sql = """
-        SELECT hd.id, hd.ngaylap, hd.tongtien
-        FROM hoadon hd
-        WHERE DATE(hd.ngaylap) BETWEEN ? AND ?
-        ORDER BY hd.ngaylap DESC
+        SELECT id, ngaylap, tongtien
+        FROM hoadon
+        WHERE ngaylap BETWEEN ? AND ?
+        ORDER BY ngaylap DESC
     """;
 
         try (Connection conn = Database_Connection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setDate(1, java.sql.Date.valueOf(LocalDate.parse(from)));
-            ps.setDate(2, java.sql.Date.valueOf(LocalDate.parse(to)));
+            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.parse(from, formatter)));
+            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.parse(to, formatter)));
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
