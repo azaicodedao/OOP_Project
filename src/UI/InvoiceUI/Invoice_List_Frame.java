@@ -12,10 +12,15 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class
 Invoice_List_Frame extends javax.swing.JFrame {
+    private JDateChooser date_from, date_to;
     private DefaultTableModel model;
     private JTable table;
     private JButton btn_Refresh, btn_Back;
@@ -36,19 +41,26 @@ Invoice_List_Frame extends javax.swing.JFrame {
         // Panel Center------------------------------------------
         JPanel pnl_Center = new JPanel(new BorderLayout());
 //        Panel Center_top
-        JPanel pnl_Center_top = new JPanel();
+        JPanel pnl_Center_top = new JPanel(new FlowLayout(2));
         JLabel lb_From =  new JLabel("From:");
-        JDateChooser date_from = new JDateChooser();
-        JLabel lb_x = new JLabel("->");
-        JLabel lb_To = new JLabel("To:");
-        JDateChooser date_to = new JDateChooser();
+        date_from = new JDateChooser();
+        date_from.setDateFormatString("dd/MM/yyyy");
 
+        JLabel lb_To = new JLabel("To:");
+        date_to = new JDateChooser();
+        date_to.setDateFormatString("dd/MM/yyyy");
+
+        // Cho phép nhập tay
+        ((JTextField) date_from.getDateEditor().getUiComponent()).setEditable(true);
+        ((JTextField) date_to.getDateEditor().getUiComponent()).setEditable(true);
+
+        JButton btn_Search = new JButton("Search");
 
         pnl_Center_top.add(lb_From);
         pnl_Center_top.add(date_from);
-        pnl_Center_top.add(lb_x);
         pnl_Center_top.add(lb_To);
         pnl_Center_top.add(date_to);
+        pnl_Center_top.add(btn_Search);
 
         pnl_Center.add(pnl_Center_top, BorderLayout.NORTH);
 
@@ -60,6 +72,8 @@ Invoice_List_Frame extends javax.swing.JFrame {
             }
         };
         table = new JTable(model);
+        //  Không cho di chuyển cột
+        table.getTableHeader().setReorderingAllowed(false);
 
         JScrollPane scrollPane = new JScrollPane(table);
         pnl_Center.add(scrollPane, BorderLayout.CENTER);
@@ -84,8 +98,50 @@ Invoice_List_Frame extends javax.swing.JFrame {
                 }
             }
         });
+        btn_Search.addActionListener(e->SearchData());
         btn_Refresh.addActionListener(e -> LoadData());
         btn_Back.addActionListener(e -> Back());
+    }
+    private void SearchData(){
+        model.setRowCount(0);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+        try {
+            Date fromDate = date_from.getDate();
+            Date toDate = date_to.getDate();
+
+            // Nếu người dùng nhập tay mà chưa chọn, vẫn đọc được từ ô nhập
+            if (fromDate == null) {
+                String text = ((JTextField) date_from.getDateEditor().getUiComponent()).getText();
+                if (!text.isEmpty()) fromDate = sdf.parse(text);
+            }
+
+            if (toDate == null) {
+                String text = ((JTextField) date_to.getDateEditor().getUiComponent()).getText();
+                if (!text.isEmpty()) toDate = sdf.parse(text);
+            }
+
+            if (fromDate == null || toDate == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập hoặc chọn đầy đủ ngày bắt đầu và kết thúc!");
+                return;
+            }
+
+//            Chuyen sang LocalDate
+            LocalDate from = fromDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+            LocalDate to = toDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+
+            ArrayList<Invoice> invoices = invoice_service.getByDateRange(from.toString(), to.toString());
+            for (Invoice i : invoices) {
+                model.addRow(new Object[]{
+                        i.getId(),
+                        MoneyFormat.format(i.getTotal()),
+                        i.getDate()
+                });
+            }
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(this, "Ngày nhập không hợp lệ! Vui lòng dùng định dạng dd/MM/yyyy.");
+        }
     }
     private void LoadData(){
         model.setRowCount(0);

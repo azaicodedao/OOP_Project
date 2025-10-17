@@ -61,6 +61,8 @@ public class Product_Manage_Frame extends JFrame {
             }
         };
         tbProduct = new JTable(model);
+        //  Không cho di chuyển cột
+        tbProduct.getTableHeader().setReorderingAllowed(false);
         JScrollPane scrollPane = new JScrollPane(tbProduct);
         pnlcenter.add(scrollPane, BorderLayout.CENTER);
 
