@@ -5,6 +5,7 @@ import Model.Product;
 import UI.Home_Frame;
 import UI.ImportUI.Import_Frame;
 import UI.InvoiceUI.Invoice_Create_Frame;
+import UI.MoneyFormat;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -56,7 +57,7 @@ public class Product_Manage_Frame extends JFrame {
             @Override
             // Cột id không được sửa trên bảng
             public boolean isCellEditable(int row, int column) {
-                return column > 0;
+                return column != 1 && column != 0 && column != 5;
             }
         };
         tbProduct = new JTable(model);
@@ -114,7 +115,7 @@ public class Product_Manage_Frame extends JFrame {
                         "Cảnh báo!", JOptionPane.WARNING_MESSAGE);
             }
             model.addRow(
-                    new Object[] { p.getId(), p.getMaSP(), p.getTenSP(), p.getDonvi(), p.getGia(), p.getSoluong() });
+                    new Object[] { p.getId(), p.getMaSP(), p.getTenSP(), p.getDonvi(), MoneyFormat.format(p.getGia()), p.getSoluong() });
         }
     }
 
@@ -129,7 +130,7 @@ public class Product_Manage_Frame extends JFrame {
         ArrayList<Product> list = product_service.getAll();
         for (Product p : list) {
             if (p.getMaSP().toLowerCase().contains(key) || p.getTenSP().toLowerCase().contains(key)) {
-                model.addRow(new Object[] { p.getId(), p.getMaSP(), p.getTenSP(), p.getDonvi(), p.getGia(),
+                model.addRow(new Object[] { p.getId(), p.getMaSP(), p.getTenSP(), p.getDonvi(), MoneyFormat.format(p.getGia()),
                         p.getSoluong() });
             }
         }
@@ -141,7 +142,7 @@ public class Product_Manage_Frame extends JFrame {
             String maSP = (String) model.getValueAt(row, 1);
             String tenSP = (String) model.getValueAt(row, 2);
             String donvi = (String) model.getValueAt(row, 3);
-            double gia = Double.parseDouble(model.getValueAt(row, 4).toString());
+            double gia = MoneyFormat.parse(model.getValueAt(row, 4).toString());
             int soluong = Integer.parseInt(model.getValueAt(row, 5).toString());
 
             Product sp = new Product(id,tenSP, donvi, gia, soluong);

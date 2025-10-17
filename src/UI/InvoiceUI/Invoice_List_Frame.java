@@ -3,6 +3,9 @@ package UI.InvoiceUI;
 import DAO.Service.InvoiceSEV.Invoice_Service;
 import Model.Invoice;
 import UI.Home_Frame;
+import UI.MoneyFormat;
+import com.toedter.calendar.JDateChooser;
+
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -34,25 +37,25 @@ Invoice_List_Frame extends javax.swing.JFrame {
         JPanel pnl_Center = new JPanel(new BorderLayout());
 //        Panel Center_top
         JPanel pnl_Center_top = new JPanel();
-
         JLabel lb_From =  new JLabel("From:");
-        JTextField from_text = new JTextField();
+        JDateChooser date_from = new JDateChooser();
         JLabel lb_x = new JLabel("->");
         JLabel lb_To = new JLabel("To:");
-        JTextField to_text = new JTextField();
+        JDateChooser date_to = new JDateChooser();
+
 
         pnl_Center_top.add(lb_From);
-        pnl_Center_top.add(from_text);
+        pnl_Center_top.add(date_from);
         pnl_Center_top.add(lb_x);
         pnl_Center_top.add(lb_To);
-        pnl_Center_top.add(to_text);
+        pnl_Center_top.add(date_to);
 
         pnl_Center.add(pnl_Center_top, BorderLayout.NORTH);
 
 //        JScrollPane Table
         String[] column_names = new String[]{"ID","Tổng tiền","Ngày lập"};
         model = new DefaultTableModel(column_names, 0){
-            public boolean isCellEditable() {
+            public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
@@ -90,7 +93,7 @@ Invoice_List_Frame extends javax.swing.JFrame {
             for (Invoice invoice : invoices) {
                 model.addRow(new Object[]{
                         invoice.getId(),
-                        invoice.getTotal(),
+                        MoneyFormat.format(invoice.getTotal()),
                         invoice.getDate()
                 });
             }
