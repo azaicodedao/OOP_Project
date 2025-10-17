@@ -5,7 +5,9 @@ import Model.Invoice;
 
 import java.io.PipedInputStream;
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class Invoice_Service {
@@ -29,6 +31,32 @@ public class Invoice_Service {
     }
     public ArrayList<Invoice> getByDateRange(String from, String to){
         ArrayList<Invoice> list = new ArrayList<>();
+        String sql = """
+        SELECT hd.id, hd.ngaylap, hd.tongtien
+        FROM hoadon hd
+        WHERE DATE(hd.ngaylap) BETWEEN ? AND ?
+        ORDER BY hd.ngaylap DESC
+    """;
+
+        try (Connection conn = Database_Connection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setDate(1, java.sql.Date.valueOf(LocalDate.parse(from)));
+            ps.setDate(2, java.sql.Date.valueOf(LocalDate.parse(to)));
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                Double total = rs.getDouble("tongtien");
+                LocalDateTime ngaylap = rs.getTimestamp("ngaylap").toLocalDateTime();
+                Invoice invoice = new Invoice(id, ngaylap, total);
+                list.add(invoice);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return list;
     }
     public int insert(Invoice invoice){
