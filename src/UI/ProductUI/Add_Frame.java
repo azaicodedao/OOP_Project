@@ -3,6 +3,8 @@ package UI.ProductUI;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
+
 import DAO.Service.ProductSEV.Product_Service;
 import Model.Product;
 
@@ -82,11 +84,50 @@ public class Add_Frame extends JFrame {
         addButton.setFont(new Font("Inter", Font.BOLD, 16));
         panel.add(addButton, gbc);
 
+        // THÊM KEY LISTENER CHO NAVIGATION
+        setupEnterNavigation();
+
         addButton.addActionListener(e -> Add_item());
 
         panel.setBackground(new Color(0xE0F2F1));
         add(panel);
         setVisible(true);
+    }
+
+    // THÊM METHOD MỚI: Thiết lập navigation bằng phím Enter
+    private void setupEnterNavigation() {
+        // Từ Tên SP -> Đơn vị
+        TenSPTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    DonViTextField.requestFocus(); // Nhảy xuống Đơn vị
+                    e.consume(); // Ngăn tiếng "bíp" (Tiếng lỗi hệ thống)
+                }
+            }
+        });
+
+        // Từ Đơn vị -> Nút Thêm SP
+        DonViTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    addButton.requestFocus(); // Nhảy xuống nút
+                    e.consume();
+                }
+            }
+        });
+
+        // Từ nút Thêm SP -> Thực hiện thêm sản phẩm
+        addButton.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+                    Add_item(); // Kích hoạt thêm sản phẩm
+                    e.consume();
+                }
+            }
+        });
     }
 
     public void Add_item() {
