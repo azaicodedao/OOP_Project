@@ -9,9 +9,9 @@ public class Product {
     private int soluong;
 
     // Đạng hiển thị trong Table
-    public Product(int id, String maSP, String tenSP, String donvi, double gia, int soluong) {
+    public Product(int id, String tenSP, String donvi, double gia, int soluong) {
         this.id = id;
-        this.maSP = maSP;
+        this.maSP = setMaSP(tenSP);
         this.tenSP = tenSP;
         this.donvi = donvi;
         this.gia = gia;

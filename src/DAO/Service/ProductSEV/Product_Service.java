@@ -16,7 +16,7 @@ public class Product_Service {
            Statement stmt = conn.createStatement();
            ResultSet rs = stmt.executeQuery(sql);
            while (rs.next()) {
-               list.add(new Product(rs.getInt("id"),rs.getString("maSP"),rs.getString("ten"),rs.getString("donvi"),rs.getDouble("gia"),rs.getInt("soluong")));
+               list.add(new Product(rs.getInt("id"),rs.getString("ten"),rs.getString("donvi"),rs.getDouble("gia"),rs.getInt("soluong")));
            }
        } catch (Exception e) {
            throw new RuntimeException(e);

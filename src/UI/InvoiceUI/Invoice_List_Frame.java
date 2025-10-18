@@ -3,15 +3,25 @@ package UI.InvoiceUI;
 import DAO.Service.InvoiceSEV.Invoice_Service;
 import Model.Invoice;
 import UI.Home_Frame;
+import UI.MoneyFormat;
+import com.toedter.calendar.JDateChooser;
+
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 
-public class Invoice_List_Frame extends javax.swing.JFrame {
+public class
+Invoice_List_Frame extends javax.swing.JFrame {
+    private JDateChooser date_from, date_to;
     private DefaultTableModel model;
     private JTable table;
     private JButton btn_Refresh, btn_Back;
@@ -32,30 +42,39 @@ public class Invoice_List_Frame extends javax.swing.JFrame {
         // Panel Center------------------------------------------
         JPanel pnl_Center = new JPanel(new BorderLayout());
 //        Panel Center_top
-        JPanel pnl_Center_top = new JPanel();
-
+        JPanel pnl_Center_top = new JPanel(new FlowLayout(2));
         JLabel lb_From =  new JLabel("From:");
-        JTextField from_text = new JTextField();
-        JLabel lb_x = new JLabel("->");
+        date_from = new JDateChooser();
+        date_from.setDateFormatString("dd/MM/yyyy");
+
         JLabel lb_To = new JLabel("To:");
-        JTextField to_text = new JTextField();
+        date_to = new JDateChooser();
+        date_to.setDateFormatString("dd/MM/yyyy");
+
+        // Cho phép nhập tay
+        ((JTextField) date_from.getDateEditor().getUiComponent()).setEditable(true);
+        ((JTextField) date_to.getDateEditor().getUiComponent()).setEditable(true);
+
+        JButton btn_Search = new JButton("Search");
 
         pnl_Center_top.add(lb_From);
-        pnl_Center_top.add(from_text);
-        pnl_Center_top.add(lb_x);
+        pnl_Center_top.add(date_from);
         pnl_Center_top.add(lb_To);
-        pnl_Center_top.add(to_text);
+        pnl_Center_top.add(date_to);
+        pnl_Center_top.add(btn_Search);
 
         pnl_Center.add(pnl_Center_top, BorderLayout.NORTH);
 
 //        JScrollPane Table
         String[] column_names = new String[]{"ID","Tổng tiền","Ngày lập"};
         model = new DefaultTableModel(column_names, 0){
-            public boolean isCellEditable() {
+            public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
         table = new JTable(model);
+        //  Không cho di chuyển cột
+        table.getTableHeader().setReorderingAllowed(false);
 
         JScrollPane scrollPane = new JScrollPane(table);
         pnl_Center.add(scrollPane, BorderLayout.CENTER);
@@ -80,8 +99,51 @@ public class Invoice_List_Frame extends javax.swing.JFrame {
                 }
             }
         });
+        btn_Search.addActionListener(e->SearchData());
         btn_Refresh.addActionListener(e -> LoadData());
         btn_Back.addActionListener(e -> Back());
+    }
+    private void SearchData(){
+        model.setRowCount(0);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        try {
+            // Lấy dữ liệu từ DateChooser
+            Date fromDate = date_from.getDate();
+            Date toDate = date_to.getDate();
+
+            // Nếu người dùng nhập tay mà chưa chọn, vẫn đọc được từ ô nhập
+            if (fromDate == null) {
+                String text = ((JTextField) date_from.getDateEditor().getUiComponent()).getText();
+                if (!text.isEmpty()) fromDate = sdf.parse(text);
+            }
+
+            if (toDate == null) {
+                String text = ((JTextField) date_to.getDateEditor().getUiComponent()).getText();
+                if (!text.isEmpty()) toDate = sdf.parse(text);
+            }
+
+            if (fromDate == null || toDate == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập hoặc chọn đầy đủ ngày bắt đầu và kết thúc!");
+                return;
+            }
+
+//            Chuyen sang LocalDateTime
+            LocalDateTime from = fromDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().atStartOfDay();
+            LocalDateTime to = toDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().atTime(23, 59, 59);
+
+            ArrayList<Invoice> invoices = invoice_service.getByDateRange(from.format(formatter), to.format(formatter));
+            for (Invoice i : invoices) {
+                model.addRow(new Object[]{
+                        i.getId(),
+                        MoneyFormat.format(i.getTotal()),
+                        i.getDate()
+                });
+            }
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(this, "Ngày nhập không hợp lệ! Vui lòng dùng định dạng dd/MM/yyyy.");
+        }
     }
     private void LoadData(){
         model.setRowCount(0);
@@ -89,7 +151,7 @@ public class Invoice_List_Frame extends javax.swing.JFrame {
             for (Invoice invoice : invoices) {
                 model.addRow(new Object[]{
                         invoice.getId(),
-                        invoice.getTotal(),
+                        MoneyFormat.format(invoice.getTotal()),
                         invoice.getDate()
                 });
             }

@@ -5,6 +5,7 @@ import Model.Product;
 import UI.Home_Frame;
 import UI.ImportUI.Import_Frame;
 import UI.InvoiceUI.Invoice_Create_Frame;
+import UI.MoneyFormat;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -21,10 +22,11 @@ public class Product_Manage_Frame extends JFrame {
     private JButton btn_Add, btn_Delete, btn_Import, btn_Back, btn_CreateInvoice, btn_Search;
     private Product_Service product_service = new Product_Service();
 
+
     public Product_Manage_Frame() {
-        setTitle("Model.Product Manage");
+        setTitle(" Quản lý sản phẩm ");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(700, 500);
+        setSize(600, 500);
         setLocationRelativeTo(null);
         setResizable(false);
         setVisible(true);
@@ -40,11 +42,11 @@ public class Product_Manage_Frame extends JFrame {
         JPanel pnlcenter = new JPanel(new BorderLayout());
         // Panel Center_top-------------
         JPanel pnl_center_top = new JPanel(null);
-        pnl_center_top.setPreferredSize(new Dimension(700, 50));
+        pnl_center_top.setPreferredSize(new Dimension(600, 50));
         txt_Search = new JTextField();
         btn_Search = new JButton("Search");
-        txt_Search.setBounds(400, 10, 150, 30);
-        btn_Search.setBounds(560, 15, 80, 20);
+        txt_Search.setBounds(300, 10, 150, 30);
+        btn_Search.setBounds(460, 15, 80, 20);
         pnl_center_top.add(txt_Search);
         pnl_center_top.add(btn_Search);
         pnlcenter.add(pnl_center_top, BorderLayout.NORTH);
@@ -55,10 +57,12 @@ public class Product_Manage_Frame extends JFrame {
             @Override
             // Cột id không được sửa trên bảng
             public boolean isCellEditable(int row, int column) {
-                return column > 0;
+                return column != 1 && column != 0 && column != 5;
             }
         };
         tbProduct = new JTable(model);
+        //  Không cho di chuyển cột
+        tbProduct.getTableHeader().setReorderingAllowed(false);
         JScrollPane scrollPane = new JScrollPane(tbProduct);
         pnlcenter.add(scrollPane, BorderLayout.CENTER);
 
@@ -103,6 +107,7 @@ public class Product_Manage_Frame extends JFrame {
     }
 
     private void LoadTable() {
+        Product_Service product_service = new Product_Service();
         model.setRowCount(0);
         ArrayList<Product> list = product_service.getAll();
         for (Product p : list) {
@@ -112,7 +117,7 @@ public class Product_Manage_Frame extends JFrame {
                         "Cảnh báo!", JOptionPane.WARNING_MESSAGE);
             }
             model.addRow(
-                    new Object[] { p.getId(), p.getMaSP(), p.getTenSP(), p.getDonvi(), p.getGia(), p.getSoluong() });
+                    new Object[] { p.getId(), p.getMaSP(), p.getTenSP(), p.getDonvi(), MoneyFormat.format(p.getGia()), p.getSoluong() });
         }
     }
 
@@ -127,7 +132,7 @@ public class Product_Manage_Frame extends JFrame {
         ArrayList<Product> list = product_service.getAll();
         for (Product p : list) {
             if (p.getMaSP().toLowerCase().contains(key) || p.getTenSP().toLowerCase().contains(key)) {
-                model.addRow(new Object[] { p.getId(), p.getMaSP(), p.getTenSP(), p.getDonvi(), p.getGia(),
+                model.addRow(new Object[] { p.getId(), p.getMaSP(), p.getTenSP(), p.getDonvi(), MoneyFormat.format(p.getGia()),
                         p.getSoluong() });
             }
         }
@@ -139,10 +144,10 @@ public class Product_Manage_Frame extends JFrame {
             String maSP = (String) model.getValueAt(row, 1);
             String tenSP = (String) model.getValueAt(row, 2);
             String donvi = (String) model.getValueAt(row, 3);
-            double gia = Double.parseDouble(model.getValueAt(row, 4).toString());
+            double gia = MoneyFormat.parse(model.getValueAt(row, 4).toString());
             int soluong = Integer.parseInt(model.getValueAt(row, 5).toString());
 
-            Product sp = new Product(id, maSP, tenSP, donvi, gia, soluong);
+            Product sp = new Product(id,tenSP, donvi, gia, soluong);
 
             // Update DB
             boolean ok = product_service.updateProduct(sp);
@@ -191,7 +196,7 @@ public class Product_Manage_Frame extends JFrame {
     }
 
     private void InvoiceCreate() {
-        new Invoice_Create_Frame();
+        Invoice_Create_Frame invoice_create_frame = new Invoice_Create_Frame();
 
     }
 
