@@ -8,6 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import com.toedter.calendar.JDateChooser;
 import java.util.List;
 import DAO.Service.ImportSEV.Import_Service;
 import Model.Import;
@@ -19,7 +20,7 @@ public class Import_List_Frame extends JFrame{
     private final JTable importTable;
     private final DefaultTableModel tableModel;
     private final JButton backButton, refreshButton, filterButton;
-    private final JTextField fromDateField, toDateField;
+    private final JDateChooser fromDateChooser, toDateChooser;
     private final Import_Service importService;
     private List<Import> importList;
 
@@ -37,15 +38,11 @@ public class Import_List_Frame extends JFrame{
 
         JLabel fromLabel = new JLabel("Từ ngày:");
         fromLabel.setFont(new Font("Inter", Font.PLAIN, 16));
-        fromDateField = new JTextField();
-        fromDateField.setFont(new Font("Inter", Font.PLAIN, 16));
-        fromDateField.setPreferredSize(new Dimension(120, 30));
+        fromDateChooser = createStyledDateChooser();
 
         JLabel toLabel = new JLabel("Đến ngày:");
         toLabel.setFont(new Font("Inter", Font.PLAIN, 16));
-        toDateField = new JTextField();
-        toDateField.setFont(new Font("Inter", Font.PLAIN, 16));
-        toDateField.setPreferredSize(new Dimension(120, 30));
+        toDateChooser = createStyledDateChooser();
 
         filterButton = createStyledButton("Lọc", new Dimension(100, 35));
         filterButton.setFont(new Font("Inter", Font.BOLD, 16));
@@ -54,15 +51,15 @@ public class Import_List_Frame extends JFrame{
         JButton clearFilterButton = createStyledButton("Xóa lọc", new Dimension(100, 35));
         clearFilterButton.setFont(new Font("Inter", Font.BOLD, 16));
         clearFilterButton.addActionListener(e -> {
-            fromDateField.setText("");
-            toDateField.setText("");
+            fromDateChooser.setDate(null); // Xóa ngày đã chọn
+            toDateChooser.setDate(null);   // Xóa ngày đã chọn
             loadImportData();
         });
 
         filterPanel.add(fromLabel);
-        filterPanel.add(fromDateField);
+        filterPanel.add(fromDateChooser);
         filterPanel.add(toLabel);
-        filterPanel.add(toDateField);
+        filterPanel.add(toDateChooser);
         filterPanel.add(filterButton);
         filterPanel.add(clearFilterButton);
 
@@ -167,37 +164,51 @@ public class Import_List_Frame extends JFrame{
         return button;
     }
 
+    private JDateChooser createStyledDateChooser() {
+        JDateChooser dateChooser = new JDateChooser();
+        dateChooser.setFont(new Font("Inter", Font.PLAIN, 16));
+        dateChooser.setPreferredSize(new Dimension(140, 30));
+        dateChooser.setDateFormatString("dd/MM/yyyy");
+
+        dateChooser.setBackground(new Color(0xE0F2F1));
+        dateChooser.getCalendarButton().setBackground(new Color(0xE0F2F1));
+        dateChooser.getDateEditor().getUiComponent().setBackground(Color.WHITE);
+
+        return dateChooser;
+    }
+
     // Lọc theo khoảng ngày
     private void filterByDateRange() {
-        String from = fromDateField.getText().trim();
-        String to = toDateField.getText().trim();
-
-        if (from.isEmpty() || to.isEmpty()) {
+        // Kiểm tra xem đã chọn ngày chưa
+        if (fromDateChooser.getDate() == null || toDateChooser.getDate() == null) {
             UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn đầy đủ ngày bắt đầu và ngày kết thúc!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        String fromDB;
-        String toDB;
+        // Lấy ngày từ JDateChooser
+        java.util.Date fromUtilDate = fromDateChooser.getDate();
+        java.util.Date toUtilDate = toDateChooser.getDate();
 
-        // Validate định dạng ngày
-        DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        // Chuyển từ java.util.Date sang java.sql.Date
+        java.sql.Date fromSqlDate = new java.sql.Date(fromUtilDate.getTime());
+        java.sql.Date toSqlDate = new java.sql.Date(toUtilDate.getTime());
+
+        // Chuyển sang LocalDate để format
+        LocalDate fromDate = fromSqlDate.toLocalDate();
+        LocalDate toDate = toSqlDate.toLocalDate();
+
+        // Kiểm tra ngày bắt đầu không lớn hơn ngày kết thúc
+        if (fromDate.isAfter(toDate)) {
+            UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
+            JOptionPane.showMessageDialog(this, "Ngày bắt đầu không thể lớn hơn ngày kết thúc!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Format sang định dạng database (yyyy-MM-dd)
         DateTimeFormatter dbFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        try {
-            // Parse theo định dạng hiển thị (dd/MM/yyyy)
-            LocalDate fromDate = LocalDate.parse(from, displayFormatter);
-            LocalDate toDate = LocalDate.parse(to, displayFormatter);
-
-            // Chuyển sang định dạng database (yyyy-MM-dd)
-            fromDB = fromDate.format(dbFormatter);
-            toDB = toDate.format(dbFormatter);
-
-        } catch (Exception e) {
-            UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
-            JOptionPane.showMessageDialog(this, "Định dạng ngày không hợp lệ! Vui lòng sử dụng định dạng dd/MM/yyyy", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        String fromDB = fromDate.format(dbFormatter);
+        String toDB = toDate.format(dbFormatter);
 
         tableModel.setRowCount(0);
 
