@@ -29,8 +29,8 @@ Invoice_List_Frame extends javax.swing.JFrame {
 
     public Invoice_List_Frame() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
         setSize(600, 500);
+        setLocationRelativeTo(null);
         setResizable(false);
         setVisible(true);
         // Panel top--------------------------------------------
