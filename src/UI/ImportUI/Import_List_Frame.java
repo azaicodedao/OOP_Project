@@ -13,7 +13,6 @@ import UI.Base_Frame;
 import com.toedter.calendar.JDateChooser;
 
 import java.util.ArrayList;
-import java.util.List;
 import DAO.Service.ImportSEV.Import_Service;
 import Model.Import;
 import UI.Home_Frame;
@@ -51,20 +50,11 @@ public class Import_List_Frame extends Base_Frame {
         btn_Filter = createButton16("Lọc");
         btn_Filter.addActionListener(e -> filterByDateRange());
 
-        JButton clearFilterButton = createButton16("Xóa lọc");
-        clearFilterButton.setFont(new Font("Inter", Font.BOLD, 16));
-        clearFilterButton.addActionListener(e -> {
-            fromDateChooser.setDate(null); // Xóa ngày đã chọn
-            toDateChooser.setDate(null);   // Xóa ngày đã chọn
-            LoadData();
-        });
-
         filterPanel.add(fromLabel);
         filterPanel.add(fromDateChooser);
         filterPanel.add(toLabel);
         filterPanel.add(toDateChooser);
         filterPanel.add(btn_Filter);
-        filterPanel.add(clearFilterButton);
 
         // Tạo model cho bảng với 3 cột
         String[] columns ={"ID", "Tổng tiền", "Ngày nhập"};
@@ -94,7 +84,9 @@ public class Import_List_Frame extends Base_Frame {
                 if(e.getClickCount() == 2){
                     int selectedRow = table.getSelectedRow();
                     if(selectedRow != -1){
-                        showImportDetail(selectedRow);
+                        Object idValue = table.getValueAt(selectedRow, 0);
+                        int selectedId = Integer.parseInt(idValue.toString());
+                        showImportDetail(selectedId);
                     }
                 }
             }
@@ -173,7 +165,7 @@ public class Import_List_Frame extends Base_Frame {
         model.setRowCount(0);
 
         try {
-            ArrayList<Import> importList = importService.getByDateRange(fromDB, toDB);
+            importList = importService.getByDateRange(fromDB, toDB);
 
             if (importList.isEmpty()) {
                 UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
@@ -200,6 +192,8 @@ public class Import_List_Frame extends Base_Frame {
 
     private void LoadData(){
         model.setRowCount(0);
+        fromDateChooser.setDate(null); // Xóa ngày đã chọn
+        toDateChooser.setDate(null);   // Xóa ngày đã chọn
 
         try{
             importList = importService.getAll();
@@ -224,12 +218,8 @@ public class Import_List_Frame extends Base_Frame {
         }
     }
 
-    private void showImportDetail(int selectedRow){
-        if(selectedRow >= 0 && selectedRow < importList.size()){
-            Import selectedImport = importList.get(selectedRow);
-            dispose();
-//            new Import_Detail_Frame(selectedImport);
-        }
+    private void showImportDetail(int selectedId){
+        new Import_Detail_Frame(selectedId);
     }
 
     private void Back(){
