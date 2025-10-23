@@ -2,6 +2,7 @@ package UI.ProductUI;
 
 import DAO.Service.ProductSEV.Product_Service;
 import Model.Product;
+import UI.Base_Frame;
 import UI.Home_Frame;
 import UI.ImportUI.Import_Frame;
 import UI.InvoiceUI.Invoice_Create_Frame;
@@ -15,55 +16,70 @@ import java.awt.*;
 import java.util.ArrayList;
 
 //Nguyễn Văn Tiến
-public class Product_Manage_Frame extends JFrame {
+public class Product_Manage_Frame extends Base_Frame {
     private JTable tbProduct;
     private DefaultTableModel model;
     private JTextField txt_Search;
-    private JButton btn_Add, btn_Delete, btn_Import, btn_Back, btn_CreateInvoice, btn_Search;
+    private JButton btn_Add, btn_Refresh, btn_Import, btn_Back, btn_CreateInvoice, btn_Search;
     private Product_Service product_service = new Product_Service();
 
 
     public Product_Manage_Frame() {
         setTitle(" Quản lý sản phẩm ");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 500);
-        setLocationRelativeTo(null);
-        setResizable(false);
-        setVisible(true);
+
 
         // Panel top ------------------------------------------------------
-        JPanel pnltop = new JPanel();
+        JPanel pnltop = new JPanel(new FlowLayout(FlowLayout.CENTER,10,5));
+        pnltop.setBackground(background_color);
         JLabel header = new JLabel("Quản lý sản phẩm");
+        header.setFont(new Font("Poppins", Font.BOLD, 20));
         pnltop.add(header);
-        pnltop.setBackground(new Color(189, 220, 239));
+        pnltop.setBackground(background_color);
         add(pnltop, BorderLayout.NORTH);
+
+        // Panel bottom -----------------------------------------------
+        JPanel pnlbottom = createPanel();
+        btn_Add = createButton16("Thêm SP");
+        btn_Refresh = createButton16("Làm mới");
+        btn_Import = createButton16("Nhập hàng");
+        btn_Import.setPreferredSize(new Dimension(150,35));
+        btn_CreateInvoice = createButton16("Tạo đơn");
+        btn_Back =createButton16("Quay lại");
+        pnlbottom.add(btn_Add);
+        pnlbottom.add(btn_Refresh);
+        pnlbottom.add(btn_Import);
+        pnlbottom.add(btn_Back);
+        pnlbottom.add(btn_CreateInvoice);
+        add(pnlbottom, BorderLayout.SOUTH);
 
         // Panel Center -------------------------------------------------------------
         JPanel pnlcenter = new JPanel(new BorderLayout());
+        pnlcenter.setBackground(background_color);
         // Panel Center_top-------------
-        JPanel pnl_center_top = new JPanel(null);
-        pnl_center_top.setPreferredSize(new Dimension(600, 50));
-        txt_Search = new JTextField();
-        btn_Search = new JButton("Search");
-        txt_Search.setBounds(300, 10, 150, 30);
-        btn_Search.setBounds(460, 15, 80, 20);
+        JPanel pnl_center_top = new JPanel(new FlowLayout(FlowLayout.RIGHT,40,5));
+        pnl_center_top.setBackground(background_color);
+        txt_Search = createTextField();
+        btn_Search = createButton16("Tìm kiếm");
         pnl_center_top.add(txt_Search);
         pnl_center_top.add(btn_Search);
         pnlcenter.add(pnl_center_top, BorderLayout.NORTH);
 
         // Panel Center_table-----------
-        String[] cols = new String[] { "ID", "Mã SP", "Tên SP", "Đơn vị", "Đơn giá", "Số lượng" };
+        String[] cols = new String[] { "ID","Tên SP", "Đơn vị", "Đơn giá", "Số lượng" };
         model = new DefaultTableModel(cols, 0) {
             @Override
             // Cột id không được sửa trên bảng
             public boolean isCellEditable(int row, int column) {
-                return column != 1 && column != 0 && column != 5;
+                return column != 1 && column != 0 && column != 4;
             }
         };
-        tbProduct = new JTable(model);
-        //  Không cho di chuyển cột
-        tbProduct.getTableHeader().setReorderingAllowed(false);
-        JScrollPane scrollPane = new JScrollPane(tbProduct);
+        tbProduct = createTable(model);
+        tbProduct.getColumnModel().getColumn(0).setCellRenderer(center_Renderer);
+        tbProduct.getColumnModel().getColumn(1).setCellRenderer(center_Renderer);
+        tbProduct.getColumnModel().getColumn(2).setCellRenderer(center_Renderer);
+        tbProduct.getColumnModel().getColumn(3).setCellRenderer(right_Renderer);
+        tbProduct.getColumnModel().getColumn(4).setCellRenderer(center_Renderer);
+        JScrollPane scrollPane = createScrollPane(tbProduct);
         pnlcenter.add(scrollPane, BorderLayout.CENTER);
 
         add(pnlcenter, BorderLayout.CENTER);
@@ -83,23 +99,9 @@ public class Product_Manage_Frame extends JFrame {
             }
         });
 
-        // Panel bottom -----------------------------------------------
-        JPanel pnlbottom = new JPanel();
-        btn_Add = new JButton("Thêm sản phẩm");
-        btn_Delete = new JButton("Xóa");
-        btn_Import = new JButton("Nhập hàng");
-        btn_CreateInvoice = new JButton("Tạo đơn");
-        btn_Back = new JButton("Quay lại");
-        pnlbottom.add(btn_Add);
-        pnlbottom.add(btn_Delete);
-        pnlbottom.add(btn_Import);
-        pnlbottom.add(btn_Back);
-        pnlbottom.add(btn_CreateInvoice);
-        add(pnlbottom, BorderLayout.SOUTH);
-
         // Xử lý sự kiện -------------------------------------------------------
         btn_Add.addActionListener(e -> Add_Product());
-        btn_Delete.addActionListener(e -> Delete_Product());
+        btn_Refresh.addActionListener(e -> refreshTable());
         btn_Import.addActionListener(e -> Import_Product());
         btn_Back.addActionListener(e -> Back());
         btn_CreateInvoice.addActionListener(e -> InvoiceCreate());
@@ -111,13 +113,13 @@ public class Product_Manage_Frame extends JFrame {
         model.setRowCount(0);
         ArrayList<Product> list = product_service.getAll();
         for (Product p : list) {
-            if (p.getSoluong() <= 10) {
+            if (p.getSoluong() <= 5) {
                 JOptionPane.showMessageDialog(this,
                         "⚠️ Sản phẩm \"" + p.getTenSP() + "\" sắp hết hàng!\n(Số lượng còn: " + p.getSoluong() + ")",
                         "Cảnh báo!", JOptionPane.WARNING_MESSAGE);
             }
             model.addRow(
-                    new Object[] { p.getId(), p.getMaSP(), p.getTenSP(), p.getDonvi(), MoneyFormat.format(p.getGia()), p.getSoluong() });
+                    new Object[] { p.getId(), p.getTenSP(), p.getDonvi(), MoneyFormat.format(p.getGia()), p.getSoluong() });
         }
     }
 
@@ -131,8 +133,8 @@ public class Product_Manage_Frame extends JFrame {
         model.setRowCount(0);
         ArrayList<Product> list = product_service.getAll();
         for (Product p : list) {
-            if (p.getMaSP().toLowerCase().contains(key) || p.getTenSP().toLowerCase().contains(key)) {
-                model.addRow(new Object[] { p.getId(), p.getMaSP(), p.getTenSP(), p.getDonvi(), MoneyFormat.format(p.getGia()),
+            if (p.getTenSP().toLowerCase().contains(key)) {
+                model.addRow(new Object[] { p.getId(), p.getTenSP(), p.getDonvi(), MoneyFormat.format(p.getGia()),
                         p.getSoluong() });
             }
         }
@@ -141,11 +143,10 @@ public class Product_Manage_Frame extends JFrame {
     private void updateProduct(int row) {
         try {
             int id = (int) model.getValueAt(row, 0);
-            String maSP = (String) model.getValueAt(row, 1);
-            String tenSP = (String) model.getValueAt(row, 2);
-            String donvi = (String) model.getValueAt(row, 3);
-            double gia = MoneyFormat.parse(model.getValueAt(row, 4).toString());
-            int soluong = Integer.parseInt(model.getValueAt(row, 5).toString());
+            String tenSP = (String) model.getValueAt(row, 1);
+            String donvi = (String) model.getValueAt(row, 2);
+            double gia = MoneyFormat.parse(model.getValueAt(row, 3).toString());
+            int soluong = Integer.parseInt(model.getValueAt(row, 4).toString());
 
             Product sp = new Product(id,tenSP, donvi, gia, soluong);
 
@@ -165,25 +166,26 @@ public class Product_Manage_Frame extends JFrame {
         Add_Frame add_frame = new Add_Frame(this);
         add_frame.setVisible(true);
     }
-
-    private void Delete_Product() {
-        int row = tbProduct.getSelectedRow();
-        if (row != -1) {
-            int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc xóa sản phẩm này không?", "Cảnh báo!",
-                    JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                int id = (int) model.getValueAt(row, 0);
-                if (product_service.deleteProduct(id)) {
-                    model.removeRow(row);
-                    JOptionPane.showMessageDialog(this, "Xóa thành công!");
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Xóa thất bại");
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Bạn chưa chọn sản phẩm để xóa!");
-        }
-    }
+//    private void Delete_Product() {}
+//
+//    private void Delete_Product() {
+//        int row = tbProduct.getSelectedRow();
+//        if (row != -1) {
+//            int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc xóa sản phẩm này không?", "Cảnh báo!",
+//                    JOptionPane.YES_NO_OPTION);
+//            if (confirm == JOptionPane.YES_OPTION) {
+//                int id = (int) model.getValueAt(row, 0);
+//                if (product_service.deleteProduct(id)) {
+//                    model.removeRow(row);
+//                    JOptionPane.showMessageDialog(this, "Xóa thành công!");
+//                }
+//            } else {
+//                JOptionPane.showMessageDialog(this, "Xóa thất bại");
+//            }
+//        } else {
+//            JOptionPane.showMessageDialog(this, "Bạn chưa chọn sản phẩm để xóa!");
+//        }
+//    }
 
     private void Import_Product() {
         new Import_Frame();

@@ -2,12 +2,14 @@ package UI.InvoiceUI;
 
 import DAO.Service.InvoiceSEV.Invoice_Service;
 import Model.Invoice;
+import UI.Base_Frame;
 import UI.Home_Frame;
 import UI.MoneyFormat;
 import com.toedter.calendar.JDateChooser;
 
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -20,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class
-Invoice_List_Frame extends javax.swing.JFrame {
+Invoice_List_Frame extends Base_Frame {
     private JDateChooser date_from, date_to;
     private DefaultTableModel model;
     private JTable table;
@@ -28,34 +30,28 @@ Invoice_List_Frame extends javax.swing.JFrame {
     private Invoice_Service invoice_service =  new Invoice_Service();
 
     public Invoice_List_Frame() {
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 500);
-        setLocationRelativeTo(null);
-        setResizable(false);
-        setVisible(true);
+        setTitle("Quản lý hóa đơn");
         // Panel top--------------------------------------------
         JPanel pnl_top = new JPanel();
-        JLabel title_label = new JLabel("📋 Danh sách hóa đơn");
+        pnl_top.setBackground(background_color);
+        JLabel title_label = new JLabel("Danh sách hóa đơn");
+        title_label.setFont(new Font("Poppins", Font.BOLD, 40));
+        title_label.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
         pnl_top.add(title_label);
 
         add(pnl_top, BorderLayout.NORTH);
         // Panel Center------------------------------------------
         JPanel pnl_Center = new JPanel(new BorderLayout());
 //        Panel Center_top
-        JPanel pnl_Center_top = new JPanel(new FlowLayout(2));
-        JLabel lb_From =  new JLabel("From:");
-        date_from = new JDateChooser();
-        date_from.setDateFormatString("dd/MM/yyyy");
+        JPanel pnl_Center_top = new JPanel(new FlowLayout(FlowLayout.CENTER,30,5));
+        pnl_Center_top.setBackground(background_color);
+        JLabel lb_From = createLabel("Từ ngày") ;
+        date_from = createDateChooser();
 
-        JLabel lb_To = new JLabel("To:");
-        date_to = new JDateChooser();
-        date_to.setDateFormatString("dd/MM/yyyy");
+        JLabel lb_To = createLabel("Đến ngày:");
+        date_to = createDateChooser();
 
-        // Cho phép nhập tay
-        ((JTextField) date_from.getDateEditor().getUiComponent()).setEditable(true);
-        ((JTextField) date_to.getDateEditor().getUiComponent()).setEditable(true);
-
-        JButton btn_Search = new JButton("Search");
+        JButton btn_Search = createButton16("Lọc");
 
         pnl_Center_top.add(lb_From);
         pnl_Center_top.add(date_from);
@@ -72,20 +68,20 @@ Invoice_List_Frame extends javax.swing.JFrame {
                 return false;
             }
         };
-        table = new JTable(model);
-        //  Không cho di chuyển cột
-        table.getTableHeader().setReorderingAllowed(false);
-
-        JScrollPane scrollPane = new JScrollPane(table);
+        table = createTable(model);
+        table.getColumnModel().getColumn(0).setCellRenderer(center_Renderer);
+        table.getColumnModel().getColumn(1).setCellRenderer(right_Renderer);
+        table.getColumnModel().getColumn(2).setCellRenderer(center_Renderer);
+        JScrollPane scrollPane = createScrollPane(table);
         pnl_Center.add(scrollPane, BorderLayout.CENTER);
         add(pnl_Center, BorderLayout.CENTER);
 
 //        JPanel bottom -------------------------------------------------------------------
-        JPanel pnl_bottom = new JPanel();
-        btn_Refresh = new JButton("Refresh");
-        btn_Back = new JButton("Home");
-        pnl_bottom.add(btn_Refresh);
+        JPanel pnl_bottom = createPanel();
+        btn_Refresh = createButton20("Làm mới");
+        btn_Back = createButton20 ("Quay lại");
         pnl_bottom.add(btn_Back);
+        pnl_bottom.add(btn_Refresh);
         add(pnl_bottom, BorderLayout.SOUTH);
         LoadData();
 
@@ -104,8 +100,6 @@ Invoice_List_Frame extends javax.swing.JFrame {
         btn_Back.addActionListener(e -> Back());
     }
     private void SearchData(){
-        model.setRowCount(0);
-
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         try {
@@ -129,6 +123,8 @@ Invoice_List_Frame extends javax.swing.JFrame {
                 return;
             }
 
+            model.setRowCount(0);
+
 //            Chuyen sang LocalDateTime
             LocalDateTime from = fromDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().atStartOfDay();
             LocalDateTime to = toDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().atTime(23, 59, 59);
@@ -147,6 +143,8 @@ Invoice_List_Frame extends javax.swing.JFrame {
     }
     private void LoadData(){
         model.setRowCount(0);
+        date_from.setDate(null);
+        date_to.setDate(null);
             ArrayList<Invoice> invoices = invoice_service.getAll();
             for (Invoice invoice : invoices) {
                 model.addRow(new Object[]{

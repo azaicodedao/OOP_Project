@@ -24,17 +24,16 @@ public class Product_Service {
        return list;
    }
    public boolean addProduct(Product pro){
-       String sql = "INSERT INTO sanpham(maSP, ten, donvi, gia, soluong) VALUES(?,?,?,?,?)";
+       String sql = "INSERT INTO sanpham(ten, donvi, gia, soluong) VALUES(?,?,?,?)";
        try (
            Connection conn = Database_Connection.getConnection();
 
            PreparedStatement ps = conn.prepareStatement(sql)) {
 
-               ps.setString(1, pro.getMaSP());
-               ps.setString(2,pro.getTenSP());
-               ps.setString(3,pro.getDonvi());
-               ps.setDouble(4,pro.getGia());
-               ps.setInt(5,pro.getSoluong());
+               ps.setString(1, pro.getTenSP());
+               ps.setString(2,pro.getDonvi());
+               ps.setDouble(3,pro.getGia());
+               ps.setInt(4,pro.getSoluong());
 
                return ps.executeUpdate()>0;
            }
@@ -59,17 +58,18 @@ public class Product_Service {
        }
        return false;
    }
-   public boolean deleteProduct(int id) {
-       String sql = "DELETE FROM sanpham WHERE id=?";
-       try(Connection conn = Database_Connection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)){
-           ps.setInt(1,id);
-       }
-       catch (SQLException e) {
-           e.printStackTrace();
-       }
-       return false;
-   }
+//   public boolean deleteProduct(int id) {
+//       String sql = "DELETE FROM sanpham WHERE id=?";
+//       try(Connection conn = Database_Connection.getConnection();
+//            PreparedStatement ps = conn.prepareStatement(sql)){
+//           ps.setInt(1,id);
+//           return ps.executeUpdate()>0;
+//       }
+//       catch (SQLException e) {
+//           e.printStackTrace();
+//       }
+//       return false;
+//   }
    public void updateInvoice(int id, int soLuongMua) {
        String sql = "UPDATE sanpham SET soluong = soluong - ? WHERE id=?";
        try( Connection conn = Database_Connection.getConnection();

@@ -8,7 +8,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
+import UI.Base_Frame;
 import com.toedter.calendar.JDateChooser;
+
+import java.util.ArrayList;
 import java.util.List;
 import DAO.Service.ImportSEV.Import_Service;
 import Model.Import;
@@ -16,15 +20,17 @@ import UI.Home_Frame;
 
 // Nguyễn Trung Nghĩa
 
-public class Import_List_Frame extends JFrame{
-    private final JTable importTable;
-    private final DefaultTableModel tableModel;
-    private final JButton backButton, refreshButton, filterButton;
-    private final JDateChooser fromDateChooser, toDateChooser;
-    private final Import_Service importService;
-    private List<Import> importList;
+public class Import_List_Frame extends Base_Frame {
+    private  JTable table;
+    private  DefaultTableModel model;
+    private  JButton btn_Back, btn_Refresh, btn_Filter;
+    private  JDateChooser fromDateChooser, toDateChooser;
+    private  Import_Service importService;
+    private  ArrayList<Import> importList;
+
 
     public Import_List_Frame(){
+        setTitle("Quản lý phiếu nhập");
 
         importService = new Import_Service();
         // Tiêu đề
@@ -34,38 +40,35 @@ public class Import_List_Frame extends JFrame{
 
         // Panel lọc ngày
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
-        filterPanel.setBackground(new Color(0xE0F2F1));
+        filterPanel.setBackground(background_color);
 
-        JLabel fromLabel = new JLabel("Từ ngày:");
-        fromLabel.setFont(new Font("Inter", Font.PLAIN, 16));
-        fromDateChooser = createStyledDateChooser();
+        JLabel fromLabel = createLabel("Từ ngày:");
+        fromDateChooser = createDateChooser();
 
-        JLabel toLabel = new JLabel("Đến ngày:");
-        toLabel.setFont(new Font("Inter", Font.PLAIN, 16));
-        toDateChooser = createStyledDateChooser();
+        JLabel toLabel = createLabel("Đến ngày:");
+        toDateChooser = createDateChooser();
 
-        filterButton = createStyledButton("Lọc", new Dimension(100, 35));
-        filterButton.setFont(new Font("Inter", Font.BOLD, 16));
-        filterButton.addActionListener(e -> filterByDateRange());
+        btn_Filter = createButton16("Lọc");
+        btn_Filter.addActionListener(e -> filterByDateRange());
 
-        JButton clearFilterButton = createStyledButton("Xóa lọc", new Dimension(100, 35));
+        JButton clearFilterButton = createButton16("Xóa lọc");
         clearFilterButton.setFont(new Font("Inter", Font.BOLD, 16));
         clearFilterButton.addActionListener(e -> {
             fromDateChooser.setDate(null); // Xóa ngày đã chọn
             toDateChooser.setDate(null);   // Xóa ngày đã chọn
-            loadImportData();
+            LoadData();
         });
 
         filterPanel.add(fromLabel);
         filterPanel.add(fromDateChooser);
         filterPanel.add(toLabel);
         filterPanel.add(toDateChooser);
-        filterPanel.add(filterButton);
+        filterPanel.add(btn_Filter);
         filterPanel.add(clearFilterButton);
 
         // Tạo model cho bảng với 3 cột
         String[] columns ={"ID", "Tổng tiền", "Ngày nhập"};
-        tableModel = new DefaultTableModel(columns, 0){
+        model = new DefaultTableModel(columns, 0){
             @Override
             public boolean isCellEditable(int row, int column){
                 return false; // Không cho phép chỉnh sửa trực tiếp
@@ -73,33 +76,23 @@ public class Import_List_Frame extends JFrame{
         };
 
         // JTable để hiển thị dữ liệu dạng bảng
-        importTable = new JTable(tableModel);
-        importTable.setFont(new Font("Inter", Font.PLAIN, 16));
-        importTable.setForeground(new Color(0x333333));
-        importTable.setRowHeight(40);
-        importTable.setSelectionBackground(new Color(0xBEE3F8));
-        importTable.setSelectionForeground(Color.BLACK);
-        importTable.getTableHeader().setFont(new Font("Inter", Font.BOLD, 16));
-        importTable.getTableHeader().setBackground(new Color(0xDCE6F1));
-        importTable.getTableHeader().setForeground(new Color(0x333333));
-        ((DefaultTableCellRenderer) importTable.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(JLabel.CENTER);
-
+        table = createTable(model);
         // Căn chỉnh độ rộng cột
-        importTable.getColumnModel().getColumn(0).setPreferredWidth(100);
-        importTable.getColumnModel().getColumn(1).setPreferredWidth(200);
-        importTable.getColumnModel().getColumn(2).setPreferredWidth(200);
+        table.getColumnModel().getColumn(0).setPreferredWidth(100);
+        table.getColumnModel().getColumn(1).setPreferredWidth(200);
+        table.getColumnModel().getColumn(2).setPreferredWidth(200);
 
         // Căn giữa hoặc phải cho các cột
-        importTable.getColumnModel().getColumn(0).setCellRenderer(new CenterRenderer());
-        importTable.getColumnModel().getColumn(1).setCellRenderer(new RightRenderer());
-        importTable.getColumnModel().getColumn(2).setCellRenderer(new CenterRenderer());
+        table.getColumnModel().getColumn(0).setCellRenderer(center_Renderer);
+        table.getColumnModel().getColumn(1).setCellRenderer(right_Renderer);
+        table.getColumnModel().getColumn(2).setCellRenderer(center_Renderer);
 
         // Sự kiện click vào hàng
-        importTable.addMouseListener(new MouseAdapter(){
+        table.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e){
                 if(e.getClickCount() == 2){
-                    int selectedRow = importTable.getSelectedRow();
+                    int selectedRow = table.getSelectedRow();
                     if(selectedRow != -1){
                         showImportDetail(selectedRow);
                     }
@@ -107,25 +100,20 @@ public class Import_List_Frame extends JFrame{
             }
         });
 
-        JScrollPane scrollPane = new JScrollPane(importTable);
-        scrollPane.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(10, 40, 10, 40),
-                BorderFactory.createLineBorder(new Color(0xA7B1B7), 2, true)
-        ));
-
+        JScrollPane scrollPane = createScrollPane(table);
         // Tạo panel cho nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         buttonPanel.setBackground(new Color(0xE0F2F1));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
 
-        backButton = createStyledButton("Quay lại", new Dimension(140, 50));
-        backButton.addActionListener(e -> goBack());
+        btn_Back = createButton20("Back");
+        btn_Back.addActionListener(e -> Back());
 
-        refreshButton = createStyledButton("Làm mới", new Dimension(140, 50));
-        refreshButton.addActionListener(e -> loadImportData());
+        btn_Refresh = createButton20("Làm mới");
+        btn_Refresh.addActionListener(e -> LoadData());
 
-        buttonPanel.add(backButton);
-        buttonPanel.add(refreshButton);
+        buttonPanel.add(btn_Back);
+        buttonPanel.add(btn_Refresh);
 
         // Layout chính
         setLayout(new BorderLayout());
@@ -138,43 +126,15 @@ public class Import_List_Frame extends JFrame{
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(filterPanel, BorderLayout.NORTH);
         centerPanel.add(scrollPane, BorderLayout.CENTER);
-        centerPanel.setBackground(new Color(0xE0F2F1));
+        centerPanel.setBackground(background_color);
 
         setLayout(new BorderLayout());
         add(titleLabel, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        loadImportData();
+        LoadData();
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle("Quản lý phiếu nhập");
-        setSize(900, 650);
-        setLocationRelativeTo(null);
-        getContentPane().setBackground(new Color(0xE0F2F1));
-        setVisible(true);
-    }
-
-    private JButton createStyledButton(String text, Dimension size){
-        JButton button = new JButton(text);
-        button.setFont(new Font("Inter", Font.BOLD, size.height == 50 ? 20 : 14));
-        button.setPreferredSize(size);
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
-        return button;
-    }
-
-    private JDateChooser createStyledDateChooser() {
-        JDateChooser dateChooser = new JDateChooser();
-        dateChooser.setFont(new Font("Inter", Font.PLAIN, 16));
-        dateChooser.setPreferredSize(new Dimension(140, 30));
-        dateChooser.setDateFormatString("dd/MM/yyyy");
-
-        dateChooser.setBackground(new Color(0xE0F2F1));
-        dateChooser.getCalendarButton().setBackground(new Color(0xE0F2F1));
-        dateChooser.getDateEditor().getUiComponent().setBackground(Color.WHITE);
-
-        return dateChooser;
     }
 
     // Lọc theo khoảng ngày
@@ -210,10 +170,10 @@ public class Import_List_Frame extends JFrame{
         String fromDB = fromDate.format(dbFormatter);
         String toDB = toDate.format(dbFormatter);
 
-        tableModel.setRowCount(0);
+        model.setRowCount(0);
 
         try {
-            importList = importService.getByDateRange(fromDB, toDB);
+            ArrayList<Import> importList = importService.getByDateRange(fromDB, toDB);
 
             if (importList.isEmpty()) {
                 UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
@@ -225,7 +185,7 @@ public class Import_List_Frame extends JFrame{
                 String formattedTotal = String.format("%,.0f VNĐ", importItem.getTotal());
                 String formattedDate = importItem.getNgayNhap().toString();
 
-                tableModel.addRow(new Object[]{importItem.getId(), formattedTotal, formattedDate});
+                model.addRow(new Object[]{importItem.getId(), formattedTotal, formattedDate});
             }
 
             UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
@@ -238,8 +198,8 @@ public class Import_List_Frame extends JFrame{
         }
     }
 
-    private void loadImportData(){
-        tableModel.setRowCount(0);
+    private void LoadData(){
+        model.setRowCount(0);
 
         try{
             importList = importService.getAll();
@@ -254,7 +214,7 @@ public class Import_List_Frame extends JFrame{
                 String formattedTotal = String.format("%,.0f VNĐ", importItem.getTotal());
                 String formattedDate = importItem.getNgayNhap().toString();
 
-                tableModel.addRow(new Object[]{importItem.getId(), formattedTotal, formattedDate});
+                model.addRow(new Object[]{importItem.getId(), formattedTotal, formattedDate});
             }
 
         } catch(Exception e){
@@ -272,7 +232,7 @@ public class Import_List_Frame extends JFrame{
         }
     }
 
-    private void goBack(){
+    private void Back(){
         dispose();
         try{
             new Home_Frame();
@@ -283,39 +243,6 @@ public class Import_List_Frame extends JFrame{
         }
     }
 
-    // Custom renderer để căn giữa
-    static class CenterRenderer extends DefaultTableCellRenderer{
-        public CenterRenderer(){
-            setHorizontalAlignment(JLabel.CENTER);
-            setBackground(Color.WHITE);
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column){
-            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            if(!isSelected){
-                c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(240, 248, 255)); // Zebra striping
-            }
-            return c;
-        }
-    }
-
-    // Custom renderer để căn phải(cho cột tiền)
-    static class RightRenderer extends DefaultTableCellRenderer{
-        public RightRenderer(){
-            setHorizontalAlignment(JLabel.RIGHT);
-            setBackground(Color.WHITE);
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column){
-            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            if(!isSelected){
-                c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(240, 248, 255));
-            }
-            return c;
-        }
-    }
 
     public static void main(String[] args){
         SwingUtilities.invokeLater(() ->{
