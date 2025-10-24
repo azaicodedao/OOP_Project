@@ -112,14 +112,19 @@ public class Product_Manage_Frame extends Base_Frame {
         Product_Service product_service = new Product_Service();
         model.setRowCount(0);
         ArrayList<Product> list = product_service.getAll();
+        StringBuilder res = new StringBuilder();
         for (Product p : list) {
             if (p.getSoluong() <= 5) {
-                JOptionPane.showMessageDialog(this,
-                        "⚠️ Sản phẩm \"" + p.getTenSP() + "\" sắp hết hàng!\n(Số lượng còn: " + p.getSoluong() + ")",
-                        "Cảnh báo!", JOptionPane.WARNING_MESSAGE);
+                res.append(p.getTenSP()).append(": ").append(p.getSoluong()).append("\n");
             }
             model.addRow(
                     new Object[] { p.getId(), p.getTenSP(), p.getDonvi(), MoneyFormat.format(p.getGia()), p.getSoluong() });
+        }
+        String result = res.toString().trim();
+        if(result.length() > 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Sản phẩm sắp hết :\n"+ result,
+                    "Cảnh báo!", JOptionPane.WARNING_MESSAGE);
         }
     }
 

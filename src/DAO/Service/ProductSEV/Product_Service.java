@@ -24,18 +24,28 @@ public class Product_Service {
        return list;
    }
    public boolean addProduct(Product pro){
-       String sql = "INSERT INTO sanpham(ten, donvi, gia, soluong) VALUES(?,?,?,?)";
+       String checksql = "SELECT COUNT(*) FROM sanpham WHERE LOWER(ten) = LOWER(?)";
+       String insertsql = "INSERT INTO sanpham(ten, donvi, gia, soluong) VALUES(?,?,?,?)";
        try (
            Connection conn = Database_Connection.getConnection();
 
-           PreparedStatement ps = conn.prepareStatement(sql)) {
+           PreparedStatement check_ps = conn.prepareStatement(checksql);
+           PreparedStatement insert_ps = conn.prepareStatement(insertsql)) {
 
-               ps.setString(1, pro.getTenSP());
-               ps.setString(2,pro.getDonvi());
-               ps.setDouble(3,pro.getGia());
-               ps.setInt(4,pro.getSoluong());
+//           Kiểm tra sản phẩm tồn tại chưa
+           check_ps.setString(1,pro.getTenSP().trim());
+           ResultSet rs = check_ps.executeQuery();
+           if (rs.next() && rs.getInt(1) > 0) {
+               // Nếu sản phẩm đã tồn tại -> thông báo
+               return false;
+           }
 
-               return ps.executeUpdate()>0;
+               insert_ps.setString(1, pro.getTenSP());
+               insert_ps.setString(2,pro.getDonvi());
+               insert_ps.setDouble(3,pro.getGia());
+               insert_ps.setInt(4,pro.getSoluong());
+
+               return insert_ps.executeUpdate()>0;
            }
        catch (SQLException e) {
            e.printStackTrace();
