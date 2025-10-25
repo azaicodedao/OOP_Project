@@ -31,7 +31,6 @@ public class Import_Frame extends Base_Frame {
     private final Import_Detail_Service import_detail_service = new Import_Detail_Service();
     private final Product_Service product_service = new Product_Service();
 
-    private double tongTien = 0;
 
     public Import_Frame() {
         setTitle("Phiếu nhập hàng");
@@ -54,7 +53,7 @@ public class Import_Frame extends Base_Frame {
         lb_GiaNhap = createLabel("Giá nhập");
         lb_GiaBan = createLabel("Giá bán");
 
-        cb_Product = new JComboBox<>();
+        cb_Product = createComboBox();
         cb_Product.setPreferredSize(new Dimension(150,30));
         txt_SoLuong = createTextField();
         txt_SoLuong.setPreferredSize(new Dimension(150,30));
@@ -133,14 +132,7 @@ public class Import_Frame extends Base_Frame {
         LoadData();
         btn_Import.addActionListener(e -> Import_Product());
         btn_Back.addActionListener(e -> Back());
-        btn_Import.addActionListener(e -> Add_Product());
-
-
-
-
-
-
-
+        btn_Add.addActionListener(e -> Add_Product());
 
     }
 
@@ -159,14 +151,29 @@ public class Import_Frame extends Base_Frame {
         new Product_Manage_Frame();
     }
 
-    // ====== Quay lại  ======
+    // ====== Thêm sản phẩm vào bảng  ======
     private void Add_Product() {
-        
+        // Tùng xử lý lấy dữ liệu rồi thêm vào bảng
+        Product selectedProduct = (Product) cb_Product.getSelectedItem();
+        try {
+            int soLuong = Integer.parseInt(txt_SoLuong.getText());
+            double giaNhap = Double.parseDouble(txt_GiaNhap.getText());
+            double giaBan = Double.parseDouble(txt_GiaBan.getText());
+            double thanhTien = soLuong * giaNhap;
+            modelTable.addRow(new Object[]{selectedProduct.getId(),selectedProduct,selectedProduct.getDonvi(), soLuong, giaNhap,giaBan,thanhTien});
+        }
+        catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this,"Vui lòng nhập đúng định dạng:\n Vd:\n"+"Số lượng: 20\n Giá nhập: 10000 \n Giá bán: 20000");
+        }
+
+
+
     }
 
 
     // ====== Xử lý nhập hàng ======
     private void Import_Product() {
+        double tongTien = 0;
         try {
             Product selectedProduct = (Product) cb_Product.getSelectedItem();
             if (selectedProduct == null) {
@@ -174,24 +181,22 @@ public class Import_Frame extends Base_Frame {
                 return;
             }
 
-            int soLuong = Integer.parseInt(txt_SoLuong.getText());
-            double giaNhap = Double.parseDouble(txt_GiaNhap.getText());
-            double giaBan = Double.parseDouble(txt_GiaBan.getText());
 
-            double thanhTien = soLuong * giaNhap;
-            tongTien += thanhTien;
-            lb_Tongtien.setText(String.valueOf(tongTien));
 
-            // Thêm vào bảng hiển thị
-            modelTable.addRow(new Object[]{
-                    selectedProduct.getId(),
-                    selectedProduct.getTenSP(),
-                    selectedProduct.getDonvi(),
-                    soLuong,
-                    giaNhap,
-                    giaBan,
-                    thanhTien
-            });
+
+//            tongTien += thanhTien;
+//            lb_Tongtien.setText(String.valueOf(tongTien));
+//
+//            // Thêm vào bảng hiển thị
+//            modelTable.addRow(new Object[]{
+//                    selectedProduct.getId(),
+//                    selectedProduct.getTenSP(),
+//                    selectedProduct.getDonvi(),
+//                    soLuong,
+//                    giaNhap,
+//                    giaBan,
+//                    thanhTien
+//            });
 
             // Tạo đối tượng phiếu nhập bằng constructor hiện có (không sửa Import.java)
             Import imp = new Import(tongTien, LocalDateTime.now());
@@ -208,9 +213,9 @@ public class Import_Frame extends Base_Frame {
             // nếu Import_Detail có trường id_Import, bạn có thể set 0 hoặc bỏ qua:
             detail.setId_Import(0); // tạm; DB có thể từ chối nếu FK NOT NULL
             detail.setId_Product(selectedProduct.getId());
-            detail.setSoluong(soLuong);
-            detail.setGiaNhap(giaNhap);
-            detail.setGiaBan(giaBan);
+//            detail.setSoluong(soLuong);
+//            detail.setGiaNhap(giaNhap);
+//            detail.setGiaBan(giaBan);
             import_detail_service.insert(detail);
 
             JOptionPane.showMessageDialog(this, "Nhập hàng thành công!");
