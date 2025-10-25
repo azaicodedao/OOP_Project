@@ -7,6 +7,7 @@ import DAO.Service.ImportSEV.Import_Service;
 import DAO.Service.ImportSEV.Import_Detail_Service;
 import DAO.Service.ProductSEV.Product_Service;
 import UI.Base_Frame;
+import UI.ProductUI.Product_Manage_Frame;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -120,52 +121,27 @@ public class Import_Frame extends Base_Frame {
         JPanel pnl_Display = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,5));
         pnl_Display.setBackground(background_color);
         lb_Tongtien = createLabel("Tổng tiền");
-        JLabel lb_Display = createLabel("");
+        JTextField txt_Display = createTextField();
+        txt_Display.setEditable(false);
         pnl_Display.add(lb_Tongtien);
-        pnl_Display.add(lb_Display);
+        pnl_Display.add(txt_Display);
 
         pnlSouth.add(pnl_button);
         pnlSouth.add(pnl_Display);
 
-
-
-
-
-
-    }
-
-    private void initComponents() {
-
-        // ====== TOP: chọn sản phẩm ======
-        JPanel topPanel = new JPanel();
-
-
-
-
-
-
-
-
-        // ====== TABLE ======
-        String[] columns = {"Mã SP", "Tên sản phẩm", "Đơn vị", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
-        modelTable = new DefaultTableModel(columns, 0);
-        tb_Import = createTable(modelTable);
-        JScrollPane scrollPane = createScrollPane(tb_Import);
-
-        // ====== BOTTOM: tổng tiền ======
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomPanel.add(new JLabel("Tổng tiền: "));
-        bottomPanel.add(lb_Tongtien);
-
-        // ====== Thêm vào frame ======
-        add(topPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.SOUTH);
-
-
-        // ====== Sự kiện ======
+//        Thêm sự kiện
+        LoadData();
         btn_Import.addActionListener(e -> Import_Product());
         btn_Back.addActionListener(e -> Back());
+        btn_Import.addActionListener(e -> Add_Product());
+
+
+
+
+
+
+
+
     }
 
     // ====== Load sản phẩm lên combobox ======
@@ -177,11 +153,17 @@ public class Import_Frame extends Base_Frame {
         }
     }
 
-    // ====== Quay lại ======
+    // ====== Quay lại  ======
     private void Back() {
         dispose(); // Đóng frame này
-        // new Main_Frame().setVisible(true); // nếu có trang chính
+        new Product_Manage_Frame();
     }
+
+    // ====== Quay lại  ======
+    private void Add_Product() {
+        
+    }
+
 
     // ====== Xử lý nhập hàng ======
     private void Import_Product() {
