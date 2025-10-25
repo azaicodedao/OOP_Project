@@ -6,6 +6,7 @@ import Model.Import_Detail;
 import DAO.Service.ImportSEV.Import_Service;
 import DAO.Service.ImportSEV.Import_Detail_Service;
 import DAO.Service.ProductSEV.Product_Service;
+import UI.Base_Frame;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -16,14 +17,14 @@ import java.util.ArrayList;
 
 // Trần Thanh Tùng
 
-public class Import_Frame extends JFrame {
+public class Import_Frame extends Base_Frame {
 
     private JComboBox<Product> cb_Product;
     private JTable tb_Import;
     private DefaultTableModel modelTable;
-    private JLabel lb_Tongtien;
+    private JLabel lb_Tongtien,lb_Product,lb_SoLuong,lb_GiaNhap,lb_GiaBan;
     private JTextField txt_SoLuong, txt_GiaNhap, txt_GiaBan;
-    private JButton btn_Import, btn_Back;
+    private JButton btn_Import, btn_Back, btn_Add;
 
     private final Import_Service import_service = new Import_Service();
     private final Import_Detail_Service import_detail_service = new Import_Detail_Service();
@@ -33,44 +34,123 @@ public class Import_Frame extends JFrame {
 
     public Import_Frame() {
         setTitle("Phiếu nhập hàng");
-        setSize(900, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setSize(1100, 650);
 
-        initComponents();
-        LoadData();
+//        Panel top - Tiêu đề
+        JPanel pnlNorth = new JPanel();
+        pnlNorth.setBackground(background_color);
+        JLabel lb_header = createLabel("BẢNG NHẬP LIỆU");
+        lb_header.setFont(new Font("Poppins", Font.BOLD, 30));
+        pnlNorth.add(lb_header);
+        add(pnlNorth, BorderLayout.NORTH);
+
+
+//        Panel West - nhập liệu
+        JPanel pnlWest = new JPanel();
+        pnlWest.setLayout(new BoxLayout(pnlWest, BoxLayout.Y_AXIS));
+        lb_Product = createLabel("Sản phẩm");
+        lb_SoLuong = createLabel("Số lượng");
+        lb_GiaNhap = createLabel("Giá nhập");
+        lb_GiaBan = createLabel("Giá bán");
+
+        cb_Product = new JComboBox<>();
+        cb_Product.setPreferredSize(new Dimension(150,30));
+        txt_SoLuong = createTextField();
+        txt_SoLuong.setPreferredSize(new Dimension(150,30));
+        txt_GiaNhap = createTextField();
+        txt_GiaNhap.setPreferredSize(new Dimension(150,30));
+        txt_GiaBan = createTextField();
+        txt_GiaBan.setPreferredSize(new Dimension(150,30));
+
+        JPanel pnlProducts = new JPanel();
+        pnlProducts.setBackground(selection_color);
+        pnlProducts.add(lb_Product);
+        pnlProducts.add(cb_Product);
+
+        JPanel pnlSoLuong = new JPanel();
+        pnlSoLuong.setBackground(selection_color);
+        pnlSoLuong.add(lb_SoLuong);
+        pnlSoLuong.add(txt_SoLuong);
+
+        JPanel pnlGiaNhap = new JPanel();
+        pnlGiaNhap.setBackground(selection_color);
+        pnlGiaNhap.add(lb_GiaNhap);
+        pnlGiaNhap.add(txt_GiaNhap);
+
+        JPanel pnlGiaBan = new JPanel();
+        pnlGiaBan.setBackground(selection_color);
+        pnlGiaBan.add(lb_GiaBan);
+        pnlGiaBan.add(txt_GiaBan);
+
+        JPanel pnlAdd = new JPanel();
+        pnlAdd.setBackground(selection_color);
+        btn_Add = createButton16("Thêm");
+        pnlAdd.add(btn_Add);
+
+        pnlWest.add(pnlProducts);
+        pnlWest.add(pnlSoLuong);
+        pnlWest.add(pnlGiaNhap);
+        pnlWest.add(pnlGiaBan);
+        pnlWest.add(pnlAdd);
+        add(pnlWest, BorderLayout.WEST);
+
+//        Panle Center - Bảng dữ liệu ------------------------
+        String[] columns = {"Mã SP", "Tên SP", "Đơn vị", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
+        modelTable = new DefaultTableModel(columns, 0);
+        tb_Import = createTable(modelTable);
+        JScrollPane scrollPane = createScrollPane(tb_Import);
+        add(scrollPane, BorderLayout.CENTER);
+
+//        Panel South - Xử lý sự kiện
+        JPanel pnlSouth = createPanel();
+        pnlSouth.setLayout(new BoxLayout(pnlSouth, BoxLayout.X_AXIS));
+
+//        Phần button
+        JPanel pnl_button = new JPanel(new FlowLayout(FlowLayout.RIGHT,50,5));
+        pnl_button.setBackground(background_color);
+        btn_Import = createButton16("Nhập hàng");
+        btn_Back = createButton16("Bảng sản phẩm");
+        btn_Import.setPreferredSize(new Dimension(120,30));
+        btn_Back.setPreferredSize(new Dimension(150,30));
+        add(pnlSouth, BorderLayout.SOUTH);
+        pnl_button.add(btn_Import);
+        pnl_button.add(btn_Back);
+
+//        Phần hiển thị
+        JPanel pnl_Display = new JPanel(new FlowLayout(FlowLayout.RIGHT,10,5));
+        pnl_Display.setBackground(background_color);
+        lb_Tongtien = createLabel("Tổng tiền");
+        JLabel lb_Display = createLabel("");
+        pnl_Display.add(lb_Tongtien);
+        pnl_Display.add(lb_Display);
+
+        pnlSouth.add(pnl_button);
+        pnlSouth.add(pnl_Display);
+
+
+
+
+
+
     }
 
     private void initComponents() {
-        JPanel panel = new JPanel(new BorderLayout());
 
         // ====== TOP: chọn sản phẩm ======
-        JPanel topPanel = new JPanel(new GridLayout(2, 5, 10, 10));
+        JPanel topPanel = new JPanel();
 
-        cb_Product = new JComboBox<>();
-        txt_SoLuong = new JTextField();
-        txt_GiaNhap = new JTextField();
-        txt_GiaBan = new JTextField();
-        lb_Tongtien = new JLabel("0", SwingConstants.RIGHT);
-        btn_Import = new JButton("Nhập hàng");
-        btn_Back = new JButton("Quay lại");
 
-        topPanel.add(new JLabel("Sản phẩm:"));
-        topPanel.add(cb_Product);
-        topPanel.add(new JLabel("Số lượng:"));
-        topPanel.add(txt_SoLuong);
-        topPanel.add(new JLabel("Giá nhập:"));
-        topPanel.add(txt_GiaNhap);
-        topPanel.add(new JLabel("Giá bán:"));
-        topPanel.add(txt_GiaBan);
-        topPanel.add(btn_Import);
-        topPanel.add(btn_Back);
+
+
+
+
+
 
         // ====== TABLE ======
         String[] columns = {"Mã SP", "Tên sản phẩm", "Đơn vị", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
         modelTable = new DefaultTableModel(columns, 0);
-        tb_Import = new JTable(modelTable);
-        JScrollPane scrollPane = new JScrollPane(tb_Import);
+        tb_Import = createTable(modelTable);
+        JScrollPane scrollPane = createScrollPane(tb_Import);
 
         // ====== BOTTOM: tổng tiền ======
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -78,11 +158,10 @@ public class Import_Frame extends JFrame {
         bottomPanel.add(lb_Tongtien);
 
         // ====== Thêm vào frame ======
-        panel.add(topPanel, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
-        panel.add(bottomPanel, BorderLayout.SOUTH);
+        add(topPanel, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
 
-        add(panel);
 
         // ====== Sự kiện ======
         btn_Import.addActionListener(e -> Import_Product());
@@ -123,7 +202,7 @@ public class Import_Frame extends JFrame {
 
             // Thêm vào bảng hiển thị
             modelTable.addRow(new Object[]{
-                    selectedProduct.getMaSP(),
+                    selectedProduct.getId(),
                     selectedProduct.getTenSP(),
                     selectedProduct.getDonvi(),
                     soLuong,
@@ -160,5 +239,9 @@ public class Import_Frame extends JFrame {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi nhập hàng!");
         }
+    }
+
+    public static void main(String[] args) {
+        new Import_Frame().setVisible(true);
     }
 }
