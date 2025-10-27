@@ -1,61 +1,106 @@
-package DAO.Service.ImportSEV;
+package UI.ImportUI;
 
-import DAO.Database_Connection;
+// Trần Thanh Tùng
+
 import Model.Import_Detail;
-import java.sql.*;
+import DAO.Service.ImportSEV.Import_Detail_Service;
+import UI.Base_Frame;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.util.ArrayList;
 
-public class Import_Detail_Service {
+public class Import_Detail_Frame extends Base_Frame {
 
-    public boolean insert(Import_Detail detail) {
-        String sql = "INSERT INTO chitietphieunhap (id_phieunhap, id_sanpham, soluongnhap, gianhap, giaban) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = Database_Connection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+    private JTable tb_ImportDetail;
+    private DefaultTableModel modelTable;
+    private JButton btn_Back;
+    private JLabel lb_TongTien;
+    private JTextField txt_TongTien;
+    private final Import_Detail_Service detail_service = new Import_Detail_Service();
 
-            ps.setInt(1, detail.getId_Import());
-            ps.setInt(2, detail.getId_Product());
-            ps.setInt(3, detail.getSoluong());
-            ps.setDouble(4, detail.getGiaNhap());
-            ps.setDouble(5, detail.getGiaBan());
+    private int idPhieuNhap; // 🟩 ID phiếu nhập được truyền vào
 
-            return ps.executeUpdate() > 0;
+    public Import_Detail_Frame(int idPhieuNhap) {
+        this.idPhieuNhap = idPhieuNhap;
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        setTitle("Chi tiết phiếu nhập #" + idPhieuNhap);
+        setSize(950, 600);
+        setLocationRelativeTo(null);
+
+        // ======= NORTH - Tiêu đề =======
+        JPanel pnlNorth = new JPanel();
+        pnlNorth.setBackground(background_color);
+        JLabel lb_header = createLabel("CHI TIẾT PHIẾU NHẬP #" + idPhieuNhap);
+        lb_header.setFont(new Font("Poppins", Font.BOLD, 26));
+        pnlNorth.add(lb_header);
+        add(pnlNorth, BorderLayout.NORTH);
+
+        // ======= CENTER - Bảng dữ liệu =======
+        String[] columns = {"ID", "Tên sản phẩm", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
+        modelTable = new DefaultTableModel(columns, 0);
+        tb_ImportDetail = createTable(modelTable);
+        JScrollPane scrollPane = createScrollPane(tb_ImportDetail);
+        add(scrollPane, BorderLayout.CENTER);
+
+        // ======= SOUTH - Tổng tiền + Nút quay lại =======
+        JPanel pnlSouth = new JPanel(new BorderLayout());
+        pnlSouth.setBackground(background_color);
+
+        // --- Tổng tiền ---
+        JPanel pnlTotal = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 5));
+        pnlTotal.setBackground(background_color);
+        lb_TongTien = createLabel("Tổng tiền:");
+        txt_TongTien = createTextField();
+        txt_TongTien.setEditable(false);
+        txt_TongTien.setPreferredSize(new Dimension(150, 30));
+        pnlTotal.add(lb_TongTien);
+        pnlTotal.add(txt_TongTien);
+
+        // --- Nút quay lại ---
+        JPanel pnlButton = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 5));
+        pnlButton.setBackground(background_color);
+        btn_Back = createButton16("Quay lại");
+        pnlButton.add(btn_Back);
+
+        pnlSouth.add(pnlButton, BorderLayout.WEST);
+        pnlSouth.add(pnlTotal, BorderLayout.EAST);
+        add(pnlSouth, BorderLayout.SOUTH);
+
+        // ======= Sự kiện =======
+        btn_Back.addActionListener(e -> {
+            dispose();
+            new Import_Frame().setVisible(true);
+        });
+
+        // ======= Load dữ liệu =======
+        LoadData();
     }
 
-    public ArrayList<Import_Detail> getAll() {
-        ArrayList<Import_Detail> list = new ArrayList<>();
-        String sql = """
-                SELECT c.id, c.id_phieunhap, s.ten AS ten_sanpham, c.id_sanpham,
-                       c.soluongnhap, c.gianhap, c.giaban, c.thanhtien
-                FROM chitietphieunhap c
-                JOIN sanpham s ON c.id_sanpham = s.id
-                ORDER BY c.id DESC
-                """;
+    // ======= Load dữ liệu theo id phiếu nhập =======
+    private void LoadData() {
+        ArrayList<Import_Detail> list = detail_service.getById(idPhieuNhap);
+        modelTable.setRowCount(0);
+        double tongTien = 0;
 
-        try (Connection conn = Database_Connection.getConnection();
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-
-            while (rs.next()) {
-                Import_Detail d = new Import_Detail();
-                d.setId(rs.getInt("id"));
-                d.setId_Import(rs.getInt("id_phieunhap"));
-                d.setId_Product(rs.getInt("id_sanpham"));
-                d.setTenSanPham(rs.getString("ten_sanpham"));
-                d.setSoluong(rs.getInt("soluongnhap"));
-                d.setGiaNhap(rs.getDouble("gianhap"));
-                d.setGiaBan(rs.getDouble("giaban"));
-                d.setThanhTien(rs.getDouble("thanhtien"));
-                list.add(d);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        for (Import_Detail d : list) {
+            modelTable.addRow(new Object[]{
+                    d.getId(),
+                    d.getTenSanPham(),
+                    d.getSoluong(),
+                    d.getGiaNhap(),
+                    d.getGiaBan(),
+                    d.getThanhTien()
+            });
+            tongTien += d.getThanhTien();
         }
-        return list;
+
+        txt_TongTien.setText(String.format("%,.0f", tongTien)); // Định dạng có dấu phẩy
+    }
+
+    // Dùng để test riêng frame này
+    public static void main(String[] args) {
+        new Import_Detail_Frame(1).setVisible(true); // ví dụ mở phiếu nhập có ID = 1
     }
 }
