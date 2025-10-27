@@ -86,6 +86,8 @@ public class Product_Service {
             PreparedStatement ps = conn.prepareStatement(sql)){
            ps.setInt(1,soLuongMua);
            ps.setInt(2,id);
+
+           ps.executeUpdate();
        }
        catch (SQLException e) {
            e.printStackTrace();
@@ -98,6 +100,8 @@ public class Product_Service {
            ps.setDouble(1,giaBan);
            ps.setInt(2,soLuongNhap);
            ps.setInt(3,id);
+
+           ps.executeUpdate();
        }
        catch (SQLException e) {
            e.printStackTrace();
