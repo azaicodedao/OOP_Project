@@ -160,7 +160,7 @@ Invoice_List_Frame extends Base_Frame {
             }
     }
     private void ViewDetail(int id){
-        new Invoice_Detai_Frame(id);
+        new Invoice_Detail_Frame(id);
     }
     private void Back(){
         new Home_Frame();
