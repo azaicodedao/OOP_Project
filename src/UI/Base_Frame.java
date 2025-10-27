@@ -1,5 +1,6 @@
 package UI;
 
+import Model.Product;
 import com.toedter.calendar.JDateChooser;
 
 import javax.swing.*;
@@ -11,6 +12,7 @@ public class Base_Frame extends JFrame {
     protected Color background_color= new Color(0xE0F2F1);
     protected Color foreground_color=new Color(0x333333);
     protected Color selection_color=new Color(0xBEE3F8);
+    protected Font text_font = new Font("Inter", Font.PLAIN, 16);
     protected DefaultTableCellRenderer center_Renderer = new DefaultTableCellRenderer();
     protected DefaultTableCellRenderer right_Renderer = new DefaultTableCellRenderer();
     protected DefaultTableCellRenderer left_Renderer = new DefaultTableCellRenderer();
@@ -43,13 +45,13 @@ public class Base_Frame extends JFrame {
     protected JTextField createTextField() {
         JTextField txt = new JTextField();
         txt.setPreferredSize(new Dimension(180, 30));
-        txt.setFont(new Font("Inter", Font.PLAIN, 16));
+        txt.setFont(text_font);
         return txt;
     }
     // Giao dien JDateChooser
     protected JDateChooser createDateChooser() {
         JDateChooser dateChooser = new JDateChooser();
-        dateChooser.setFont(new Font("Inter", Font.PLAIN, 16));
+        dateChooser.setFont(text_font);
         dateChooser.setPreferredSize(new Dimension(140, 30));
         dateChooser.setDateFormatString("dd/MM/yyyy");
 
@@ -65,8 +67,16 @@ public class Base_Frame extends JFrame {
     // Giao dien JLabel
     protected JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Inter", Font.PLAIN, 16));
+        label.setFont(text_font);
         return label;
+    }
+    // Giao dien Combobox
+    protected <T>JComboBox<T> createComboBox() {
+        JComboBox<T> comboBox = new JComboBox<>();
+        comboBox.setFont(text_font);
+        comboBox.setPreferredSize(new Dimension(180, 30));
+        comboBox.setMaximumRowCount(6);
+        return comboBox;
     }
     // Giao dien JTable
     protected JTable createTable(TableModel model) {
@@ -74,12 +84,12 @@ public class Base_Frame extends JFrame {
         center_Renderer.setHorizontalAlignment(JLabel.CENTER);
         right_Renderer.setHorizontalAlignment(JLabel.RIGHT);
 
-        table.setFont(new Font("Inter", Font.PLAIN, 16));
+        table.setFont(text_font);
         table.setForeground(foreground_color);
         table.setRowHeight(40);
         table.setSelectionBackground(selection_color);
         table.setSelectionForeground(Color.BLACK);
-        table.getTableHeader().setFont(new Font("Inter", Font.BOLD, 16));
+        table.getTableHeader().setFont(text_font);
         table.getTableHeader().setBackground(new Color(0xDCE6F1));
         table.getTableHeader().setForeground(new Color(0x333333));
 

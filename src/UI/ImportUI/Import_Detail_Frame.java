@@ -1,104 +1,106 @@
 package UI.ImportUI;
 
-// Tran Thanh Tung
+// Trần Thanh Tùng
 
+import Model.Import_Detail;
 import DAO.Service.ImportSEV.Import_Detail_Service;
+import UI.Base_Frame;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 
-import Model.Import_Detail;
+public class Import_Detail_Frame extends Base_Frame {
 
-public class Import_Detail_Frame extends JFrame {
-
-    private JTable tb_import_detail;
-    private DefaultTableModel model;
-    private JButton btn_Print;
+    private JTable tb_ImportDetail;
+    private DefaultTableModel modelTable;
     private JButton btn_Back;
-    private Import_Detail_Service importDetailService;
-    private int id_Import;
+    private JLabel lb_TongTien;
+    private JTextField txt_TongTien;
+    private final Import_Detail_Service detail_service = new Import_Detail_Service();
 
-    // --- Constructor ---
-    public Import_Detail_Frame(int id_Import) {
-        this.id_Import = id_Import;
-        importDetailService = new Import_Detail_Service();
+    private int idPhieuNhap; // 🟩 ID phiếu nhập được truyền vào
 
-        setTitle("Chi tiết phiếu nhập #" + id_Import);
-        setSize(800, 500);
+    public Import_Detail_Frame(int idPhieuNhap) {
+        this.idPhieuNhap = idPhieuNhap;
+
+        setTitle("Chi tiết phiếu nhập #" + idPhieuNhap);
+        setSize(950, 600);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new BorderLayout());
 
-        // Table setup
-        model = new DefaultTableModel();
-        model.setColumnIdentifiers(new Object[]{
-                "Mã Sản Phẩm", "Tên Sản Phẩm", "Số Lượng", "Giá Nhập", "Thành Tiền"
-        });
+        // ======= NORTH - Tiêu đề =======
+        JPanel pnlNorth = new JPanel();
+        pnlNorth.setBackground(background_color);
+        JLabel lb_header = createLabel("CHI TIẾT PHIẾU NHẬP #" + idPhieuNhap);
+        lb_header.setFont(new Font("Poppins", Font.BOLD, 26));
+        pnlNorth.add(lb_header);
+        add(pnlNorth, BorderLayout.NORTH);
 
-        tb_import_detail = new JTable(model);
-        JScrollPane scrollPane = new JScrollPane(tb_import_detail);
+        // ======= CENTER - Bảng dữ liệu =======
+        String[] columns = {"ID", "Tên sản phẩm", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
+        modelTable = new DefaultTableModel(columns, 0);
+        tb_ImportDetail = createTable(modelTable);
+        JScrollPane scrollPane = createScrollPane(tb_ImportDetail);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Button panel
-        JPanel btnPanel = new JPanel();
-        btn_Print = new JButton("In / Xuất PDF");
-        btn_Back = new JButton("Quay lại");
-        btnPanel.add(btn_Print);
-        btnPanel.add(btn_Back);
-        add(btnPanel, BorderLayout.SOUTH);
+        // ======= SOUTH - Tổng tiền + Nút quay lại =======
+        JPanel pnlSouth = new JPanel(new BorderLayout());
+        pnlSouth.setBackground(background_color);
 
-        // Load data
+        // --- Tổng tiền ---
+        JPanel pnlTotal = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 5));
+        pnlTotal.setBackground(background_color);
+        lb_TongTien = createLabel("Tổng tiền:");
+        txt_TongTien = createTextField();
+        txt_TongTien.setEditable(false);
+        txt_TongTien.setPreferredSize(new Dimension(150, 30));
+        pnlTotal.add(lb_TongTien);
+        pnlTotal.add(txt_TongTien);
+
+        // --- Nút quay lại ---
+        JPanel pnlButton = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 5));
+        pnlButton.setBackground(background_color);
+        btn_Back = createButton16("Quay lại");
+        pnlButton.add(btn_Back);
+
+        pnlSouth.add(pnlButton, BorderLayout.WEST);
+        pnlSouth.add(pnlTotal, BorderLayout.EAST);
+        add(pnlSouth, BorderLayout.SOUTH);
+
+        // ======= Sự kiện =======
+        btn_Back.addActionListener(e -> {
+            dispose();
+            new Import_Frame().setVisible(true);
+        });
+
+        // ======= Load dữ liệu =======
         LoadData();
-
-        // Button actions
-        btn_Back.addActionListener(e -> Back());
-        btn_Print.addActionListener(e -> exportPDF(id_Import));
-
-        setVisible(true);
     }
 
-    // --- Quay lại ---
-    private void Back() {
-        dispose();
-        // Có thể mở lại frame trước đó nếu cần
-    }
-
-    // --- Load dữ liệu từ database/service ---
+    // ======= Load dữ liệu theo id phiếu nhập =======
     private void LoadData() {
-        model.setRowCount(0); // clear
-        ArrayList<Import_Detail> list = importDetailService.getAllByImportId(id_Import);
-
-        if (list == null || list.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Không có dữ liệu chi tiết phiếu nhập!");
-            return;
-        }
+        ArrayList<Import_Detail> list = detail_service.getById(idPhieuNhap);
+        modelTable.setRowCount(0);
+        double tongTien = 0;
 
         for (Import_Detail d : list) {
-            model.addRow(new Object[]{
-                    d.getId_Product(),
-                    "Tên SP #" + d.getId_Product(),
+            modelTable.addRow(new Object[]{
+                    d.getId(),
+                    d.getTenSanPham(),
                     d.getSoluong(),
                     d.getGiaNhap(),
-                    d.getThanhTien(),
+                    d.getGiaBan(),
+                    d.getThanhTien()
             });
+            tongTien += d.getThanhTien();
         }
+
+        txt_TongTien.setText(String.format("%,.0f", tongTien)); // Định dạng có dấu phẩy
     }
 
-    // --- Xuất PDF ---
-    private void exportPDF(int id_Invoice) {
-        try {
-            JOptionPane.showMessageDialog(this, "Xuất PDF cho phiếu nhập #" + id_Invoice + " thành công!");
-            // TODO: gọi class hỗ trợ xuất PDF nếu có (ví dụ: PDFExporter.exportImportDetail(...))
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Lỗi khi xuất PDF: " + e.getMessage());
-        }
-    }
-
-    // --- Chạy thử ---
+    // Dùng để test riêng frame này
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Import_Detail_Frame(1));
+        new Import_Detail_Frame(1).setVisible(true); // ví dụ mở phiếu nhập có ID = 1
     }
 }
