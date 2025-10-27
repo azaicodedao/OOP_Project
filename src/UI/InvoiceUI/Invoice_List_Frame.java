@@ -42,6 +42,7 @@ Invoice_List_Frame extends Base_Frame {
         add(pnl_top, BorderLayout.NORTH);
         // Panel Center------------------------------------------
         JPanel pnl_Center = new JPanel(new BorderLayout());
+        pnl_Center.setBackground(background_color);
 //        Panel Center_top
         JPanel pnl_Center_top = new JPanel(new FlowLayout(FlowLayout.CENTER,30,5));
         pnl_Center_top.setBackground(background_color);

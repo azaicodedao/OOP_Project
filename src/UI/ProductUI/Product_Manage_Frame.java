@@ -28,40 +28,49 @@ public class Product_Manage_Frame extends Base_Frame {
         setTitle(" Quản lý sản phẩm ");
 
 
-        // Panel top ------------------------------------------------------
+        // Panel top : Tiêu đề ------------------------------------------------------
         JPanel pnltop = new JPanel(new FlowLayout(FlowLayout.CENTER,10,5));
         pnltop.setBackground(background_color);
         JLabel header = new JLabel("Quản lý sản phẩm");
-        header.setFont(new Font("Poppins", Font.BOLD, 20));
+        header.setFont(new Font("Poppins", Font.BOLD, 30));
         pnltop.add(header);
         pnltop.setBackground(background_color);
         add(pnltop, BorderLayout.NORTH);
 
-        // Panel bottom -----------------------------------------------
+        // Panel bottom : Các nút: Làm mới, quay lại, thêm sản phẩm -----------------------------------------------
         JPanel pnlbottom = createPanel();
         btn_Add = createButton16("Thêm SP");
         btn_Refresh = createButton16("Làm mới");
-        btn_Import = createButton16("Nhập hàng");
-        btn_Import.setPreferredSize(new Dimension(150,35));
-        btn_CreateInvoice = createButton16("Tạo đơn");
         btn_Back =createButton16("Quay lại");
         pnlbottom.add(btn_Add);
         pnlbottom.add(btn_Refresh);
-        pnlbottom.add(btn_Import);
         pnlbottom.add(btn_Back);
-        pnlbottom.add(btn_CreateInvoice);
         add(pnlbottom, BorderLayout.SOUTH);
 
         // Panel Center -------------------------------------------------------------
         JPanel pnlcenter = new JPanel(new BorderLayout());
         pnlcenter.setBackground(background_color);
-        // Panel Center_top-------------
-        JPanel pnl_center_top = new JPanel(new FlowLayout(FlowLayout.RIGHT,40,5));
-        pnl_center_top.setBackground(background_color);
+        // Panel Center_top: Các nút :Nhập hàng, Tạo đơn, Phần tìm kiếm-------------
+        JPanel pnl_center_top = new JPanel();
+        pnl_center_top.setLayout(new BoxLayout(pnl_center_top, BoxLayout.X_AXIS));
+
+        JPanel pnl_center_top_left = new JPanel(new FlowLayout(FlowLayout.LEFT,40,5));
+        pnl_center_top_left.setBackground(background_color);
+        btn_Import = createButton16("Nhập hàng");
+        btn_CreateInvoice = createButton16("Tạo đơn");
+        btn_Import.setPreferredSize(new Dimension(150,35));
+        pnl_center_top_left.add(btn_Import);
+        pnl_center_top_left.add(btn_CreateInvoice);
+
+        JPanel pnl_center_top_right = new JPanel(new FlowLayout(FlowLayout.RIGHT,40,5));
+        pnl_center_top_right.setBackground(background_color);
         txt_Search = createTextField();
         btn_Search = createButton16("Tìm kiếm");
-        pnl_center_top.add(txt_Search);
-        pnl_center_top.add(btn_Search);
+        pnl_center_top_right.add(txt_Search);
+        pnl_center_top_right.add(btn_Search);
+
+        pnl_center_top.add(pnl_center_top_left);
+        pnl_center_top.add(pnl_center_top_right);
         pnlcenter.add(pnl_center_top, BorderLayout.NORTH);
 
         // Panel Center_table-----------
@@ -74,6 +83,7 @@ public class Product_Manage_Frame extends Base_Frame {
             }
         };
         tbProduct = createTable(model);
+        //  Căn nội dung các cột
         tbProduct.getColumnModel().getColumn(0).setCellRenderer(center_Renderer);
         tbProduct.getColumnModel().getColumn(1).setCellRenderer(center_Renderer);
         tbProduct.getColumnModel().getColumn(2).setCellRenderer(center_Renderer);
@@ -87,13 +97,13 @@ public class Product_Manage_Frame extends Base_Frame {
         // Cập nhật dữ liệu của bảng
         LoadTable();
 
-        // Sửa dữ liệu trên bảng
+        // Sửa dữ liệu trực tiếp trên bảng
         model.addTableModelListener(new TableModelListener() {
 
             @Override
             public void tableChanged(TableModelEvent e) {
                 if (e.getType() == TableModelEvent.UPDATE) {
-                    int row = e.getFirstRow(); // hàng đầu tiên bị thay đổi
+                    int row = e.getFirstRow(); // hàng  bị thay đổi
                     updateProduct(row);
                 }
             }
@@ -107,7 +117,7 @@ public class Product_Manage_Frame extends Base_Frame {
         btn_CreateInvoice.addActionListener(e -> InvoiceCreate());
         btn_Search.addActionListener(e -> Search_Product());
     }
-
+    // Hàm load dữ liệu cho bảng
     private void LoadTable() {
         Product_Service product_service = new Product_Service();
         model.setRowCount(0);
@@ -128,7 +138,7 @@ public class Product_Manage_Frame extends Base_Frame {
         }
     }
 
-    // Load lại bảng khi thêm sản phẩm xong
+    // Load lại bảng khi sửa sản phẩm xong
     public void refreshTable() {
         LoadTable();
     }
@@ -144,7 +154,7 @@ public class Product_Manage_Frame extends Base_Frame {
             }
         }
     }
-
+    // Hàm sửa sản phẩm khi sửa trực tiếp trên bảng
     private void updateProduct(int row) {
         try {
             int id = (int) model.getValueAt(row, 0);
@@ -193,16 +203,18 @@ public class Product_Manage_Frame extends Base_Frame {
 //    }
 
     private void Import_Product() {
+        dispose();
         new Import_Frame();
     }
 
     private void Back() {
+        dispose();
         Home_Frame home_frame = new Home_Frame();
         home_frame.setVisible(true);
-        dispose();
     }
 
     private void InvoiceCreate() {
+        dispose();
         Invoice_Create_Frame invoice_create_frame = new Invoice_Create_Frame();
 
     }
