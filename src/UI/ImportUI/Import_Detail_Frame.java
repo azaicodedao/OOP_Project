@@ -20,15 +20,19 @@ public class Import_Detail_Frame extends Base_Frame {
     private JTextField txt_TongTien;
     private final Import_Detail_Service detail_service = new Import_Detail_Service();
 
-    public Import_Detail_Frame() {
-        setTitle("Chi tiết phiếu nhập");
+    private int idPhieuNhap; // 🟩 ID phiếu nhập được truyền vào
+
+    public Import_Detail_Frame(int idPhieuNhap) {
+        this.idPhieuNhap = idPhieuNhap;
+
+        setTitle("Chi tiết phiếu nhập #" + idPhieuNhap);
         setSize(950, 600);
         setLocationRelativeTo(null);
 
         // ======= NORTH - Tiêu đề =======
         JPanel pnlNorth = new JPanel();
         pnlNorth.setBackground(background_color);
-        JLabel lb_header = createLabel("CHI TIẾT PHIẾU NHẬP");
+        JLabel lb_header = createLabel("CHI TIẾT PHIẾU NHẬP #" + idPhieuNhap);
         lb_header.setFont(new Font("Poppins", Font.BOLD, 26));
         pnlNorth.add(lb_header);
         add(pnlNorth, BorderLayout.NORTH);
@@ -44,7 +48,7 @@ public class Import_Detail_Frame extends Base_Frame {
         JPanel pnlSouth = new JPanel(new BorderLayout());
         pnlSouth.setBackground(background_color);
 
-        // --- Phần hiển thị tổng tiền ---
+        // --- Tổng tiền ---
         JPanel pnlTotal = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 5));
         pnlTotal.setBackground(background_color);
         lb_TongTien = createLabel("Tổng tiền:");
@@ -54,7 +58,7 @@ public class Import_Detail_Frame extends Base_Frame {
         pnlTotal.add(lb_TongTien);
         pnlTotal.add(txt_TongTien);
 
-        // --- Phần nút quay lại ---
+        // --- Nút quay lại ---
         JPanel pnlButton = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 5));
         pnlButton.setBackground(background_color);
         btn_Back = createButton16("Quay lại");
@@ -62,7 +66,6 @@ public class Import_Detail_Frame extends Base_Frame {
 
         pnlSouth.add(pnlButton, BorderLayout.WEST);
         pnlSouth.add(pnlTotal, BorderLayout.EAST);
-
         add(pnlSouth, BorderLayout.SOUTH);
 
         // ======= Sự kiện =======
@@ -75,9 +78,9 @@ public class Import_Detail_Frame extends Base_Frame {
         LoadData();
     }
 
-    // ======= Load dữ liệu từ DB =======
+    // ======= Load dữ liệu theo id phiếu nhập =======
     private void LoadData() {
-        ArrayList<Import_Detail> list = detail_service.getAll();
+        ArrayList<Import_Detail> list = detail_service.getById(idPhieuNhap);
         modelTable.setRowCount(0);
         double tongTien = 0;
 
@@ -93,10 +96,11 @@ public class Import_Detail_Frame extends Base_Frame {
             tongTien += d.getThanhTien();
         }
 
-        txt_TongTien.setText(String.valueOf(tongTien));
+        txt_TongTien.setText(String.format("%,.0f", tongTien)); // Định dạng có dấu phẩy
     }
 
+    // Dùng để test riêng frame này
     public static void main(String[] args) {
-        new Import_Detail_Frame().setVisible(true);
+        new Import_Detail_Frame(1).setVisible(true); // ví dụ mở phiếu nhập có ID = 1
     }
 }
