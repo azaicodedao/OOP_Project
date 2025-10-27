@@ -91,7 +91,7 @@ Invoice_List_Frame extends Base_Frame {
                 if(e.getClickCount()==2 && table.getSelectedRow()!=-1){
                     int row = table.getSelectedRow();
                     int id_Hoadon = (int) table.getValueAt(row,0);
-//                    ViewDetail(id_Hoadon);
+                    ViewDetail(id_Hoadon);
                 }
             }
         });
@@ -158,9 +158,9 @@ Invoice_List_Frame extends Base_Frame {
                 model.setRowCount(10);
             }
     }
-//    private void ViewDetail(int id){
-//        new Invoice_Detai_Frame(id);
-//    }
+    private void ViewDetail(int id){
+        new Invoice_Detai_Frame(id);
+    }
     private void Back(){
         new Home_Frame();
         setVisible(false);
