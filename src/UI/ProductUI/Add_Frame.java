@@ -15,8 +15,6 @@ public class Add_Frame extends JFrame {
     private final Product_Manage_Frame parent;
     private final Product_Service productService;
 
-    JPanel panel = new JPanel(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
     JLabel titleLabel = new JLabel("Thêm sản phẩm");
     JLabel TenSPLabel = new JLabel("Tên SP:");
     JTextField TenSPTextField = new JTextField();
@@ -35,6 +33,9 @@ public class Add_Frame extends JFrame {
         setSize(450, 330);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.insets = new Insets(0, 0, 20, 0);
         gbc.fill = GridBagConstraints.NONE;
