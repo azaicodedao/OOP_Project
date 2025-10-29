@@ -78,7 +78,7 @@ Invoice_List_Frame extends Base_Frame {
         add(pnl_Center, BorderLayout.CENTER);
 
 //        JPanel bottom -------------------------------------------------------------------
-        JPanel pnl_bottom = createPanel();
+        JPanel pnl_bottom = createPanelBottom();
         btn_Refresh = createButton20("Làm mới");
         btn_Back = createButton20 ("Quay lại");
         pnl_bottom.add(btn_Back);

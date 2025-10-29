@@ -38,7 +38,7 @@ public class Product_Manage_Frame extends Base_Frame {
         add(pnltop, BorderLayout.NORTH);
 
         // Panel bottom : Các nút: Làm mới, quay lại, thêm sản phẩm -----------------------------------------------
-        JPanel pnlbottom = createPanel();
+        JPanel pnlbottom = createPanelBottom();
         btn_Add = createButton16("Thêm SP");
         btn_Refresh = createButton16("Làm mới");
         btn_Back =createButton16("Quay lại");
