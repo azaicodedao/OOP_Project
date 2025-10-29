@@ -98,7 +98,7 @@ public class Import_List_Frame extends Base_Frame {
         buttonPanel.setBackground(new Color(0xE0F2F1));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
 
-        btn_Back = createButton20("Back");
+        btn_Back = createButton20("Quay lại");
         btn_Back.addActionListener(e -> Back());
 
         btn_Refresh = createButton20("Làm mới");
