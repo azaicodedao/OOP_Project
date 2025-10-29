@@ -7,10 +7,11 @@ import java.awt.event.*;
 
 import DAO.Service.ProductSEV.Product_Service;
 import Model.Product;
+import UI.Base_Frame;
 
 // Nguyễn Trung Nghĩa
 
-public class Add_Frame extends JFrame {
+public class Add_Frame extends Base_Frame {
 
     private final Product_Manage_Frame parent;
     private final Product_Service productService;
@@ -20,10 +21,7 @@ public class Add_Frame extends JFrame {
     JTextField TenSPTextField = new JTextField();
     JLabel DonViLabel = new JLabel("Đơn vị:");
     JTextField DonViTextField = new JTextField();
-    JButton addButton = new JButton("Thêm SP");
-
-    Font labelFont = new Font("Poppins", Font.PLAIN, 16);
-    Font fieldFont = new Font("Poppins", Font.PLAIN, 16);
+    JButton addButton;
 
     public Add_Frame(Product_Manage_Frame parent){
         this.parent = parent;
@@ -42,16 +40,16 @@ public class Add_Frame extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
 
         TenSPLabel.setPreferredSize(new Dimension(120, 35));
-        TenSPLabel.setFont(labelFont);
+        TenSPLabel.setFont(text_font);
 
         TenSPTextField.setPreferredSize(new Dimension(250, 35));
-        TenSPTextField.setFont(fieldFont);
+        TenSPTextField.setFont(text_font);
 
         DonViLabel.setPreferredSize(new Dimension(120, 35));
-        DonViLabel.setFont(labelFont);
+        DonViLabel.setFont(text_font);
 
         DonViTextField.setPreferredSize(new Dimension(250, 35));
-        DonViTextField.setFont(fieldFont);
+        DonViTextField.setFont(text_font);
 
         // Layout components
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
@@ -77,12 +75,12 @@ public class Add_Frame extends JFrame {
         gbc.gridx = 1; gbc.gridy = 2;
         panel.add(DonViTextField, gbc);
 
+        addButton = createButton16("Thêm SP");
+
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.insets = new Insets(5, 0, 0, 0);
         gbc.fill = GridBagConstraints.NONE;
-        addButton.setPreferredSize(new Dimension(120, 40));
-        addButton.setFont(new Font("Inter", Font.BOLD, 16));
         panel.add(addButton, gbc);
 
         // THÊM KEY LISTENER CHO NAVIGATION
@@ -90,7 +88,7 @@ public class Add_Frame extends JFrame {
 
         addButton.addActionListener(e -> Add_item());
 
-        panel.setBackground(new Color(0xE0F2F1));
+        panel.setBackground(background_color);
         add(panel);
         setVisible(true);
     }
@@ -136,7 +134,7 @@ public class Add_Frame extends JFrame {
         String donvi = DonViTextField.getText().trim();
 
         if(ten.isEmpty() || donvi.isEmpty()){
-            UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16)); // Căn chỉnh font chữ OptionPane
+            UIManager.put("OptionPane.messageFont", text_font); // Căn chỉnh font chữ OptionPane
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!", "Thiếu dữ liệu", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -144,7 +142,7 @@ public class Add_Frame extends JFrame {
         Product newProduct = new Product(ten, donvi);
 
         if(productService.addProduct(newProduct)){
-            UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
+            UIManager.put("OptionPane.messageFont", text_font);
             JOptionPane.showMessageDialog(this, "Thêm sản phẩm thành công!");
             TenSPTextField.setText("");
             DonViTextField.setText("");
@@ -154,6 +152,7 @@ public class Add_Frame extends JFrame {
             }
         }
         else{
+            UIManager.put("OptionPane.messageFont", text_font);
             JOptionPane.showMessageDialog(this, "Sản phẩm đã tồn tại", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
