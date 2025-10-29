@@ -42,6 +42,7 @@ Invoice_List_Frame extends Base_Frame {
         add(pnl_top, BorderLayout.NORTH);
         // Panel Center------------------------------------------
         JPanel pnl_Center = new JPanel(new BorderLayout());
+        pnl_Center.setBackground(background_color);
 //        Panel Center_top
         JPanel pnl_Center_top = new JPanel(new FlowLayout(FlowLayout.CENTER,30,5));
         pnl_Center_top.setBackground(background_color);
@@ -77,7 +78,7 @@ Invoice_List_Frame extends Base_Frame {
         add(pnl_Center, BorderLayout.CENTER);
 
 //        JPanel bottom -------------------------------------------------------------------
-        JPanel pnl_bottom = createPanel();
+        JPanel pnl_bottom = createPanelBottom();
         btn_Refresh = createButton20("Làm mới");
         btn_Back = createButton20 ("Quay lại");
         pnl_bottom.add(btn_Back);
@@ -91,7 +92,7 @@ Invoice_List_Frame extends Base_Frame {
                 if(e.getClickCount()==2 && table.getSelectedRow()!=-1){
                     int row = table.getSelectedRow();
                     int id_Hoadon = (int) table.getValueAt(row,0);
-//                    ViewDetail(id_Hoadon);
+                    ViewDetail(id_Hoadon);
                 }
             }
         });
@@ -158,9 +159,9 @@ Invoice_List_Frame extends Base_Frame {
                 model.setRowCount(10);
             }
     }
-//    private void ViewDetail(int id){
-//        new Invoice_Detai_Frame(id);
-//    }
+    private void ViewDetail(int id){
+        new Invoice_Detail_Frame(id);
+    }
     private void Back(){
         new Home_Frame();
         setVisible(false);

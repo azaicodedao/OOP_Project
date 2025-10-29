@@ -83,6 +83,7 @@ public class Base_Frame extends JFrame {
         JTable table = new JTable(model);
         center_Renderer.setHorizontalAlignment(JLabel.CENTER);
         right_Renderer.setHorizontalAlignment(JLabel.RIGHT);
+        left_Renderer.setHorizontalAlignment(JLabel.LEFT);
 
         table.setFont(text_font);
         table.setForeground(foreground_color);
@@ -112,7 +113,7 @@ public class Base_Frame extends JFrame {
         return scrollPane;
     }
     // Giao dien JPanelBottom
-    protected JPanel createPanel() {
+    protected JPanel createPanelBottom() {
         JPanel pnl_bottom = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         pnl_bottom.setBackground(background_color);
         pnl_bottom.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
