@@ -1,10 +1,13 @@
 package DAO.Service.ProductSEV;
 
 import DAO.Database_Connection;
+import Model.Invoice;
 import Model.Product;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class Product_Service {
    public ArrayList<Product> getAll(){
@@ -107,4 +110,32 @@ public class Product_Service {
            e.printStackTrace();
        }
    }
+    public Optional<Product> getProductById(int id){
+        // Giả định bảng: sanpham (id, ten, donvi, gia, soluong)
+        String sql = "SELECT id, ten, donvi, gia, soluong FROM sanpham WHERE id = ?";
+
+        try (Connection conn = Database_Connection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // Giả định constructor Product: new Product(id, ten, donvi, gia, soluong)
+                    Product p = new Product(
+                            rs.getInt("id"),
+                            rs.getString("ten"),
+                            rs.getString("donvi"),
+                            rs.getDouble("gia"),
+                            rs.getInt("soluong")
+                    );
+                    return Optional.of(p);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+
 }

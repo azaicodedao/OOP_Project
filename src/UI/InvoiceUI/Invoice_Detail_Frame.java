@@ -160,7 +160,6 @@ public class Invoice_Detail_Frame extends Base_Frame {
     }
 
     private void BackToList() {
-        new Invoice_List_Frame().setVisible(true);
         dispose();
     }
 

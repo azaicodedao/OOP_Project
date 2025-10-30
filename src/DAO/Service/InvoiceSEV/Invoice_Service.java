@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class Invoice_Service {
     public ArrayList<Invoice> getAll(){
@@ -80,6 +81,29 @@ public class Invoice_Service {
             e.printStackTrace();
         }
         return -1;
+    }
+    public Optional<Invoice> getInvoiceById(int id){
+        String sql = "SELECT id, ngaylap, tongtien FROM hoadon WHERE id = ?";
+
+        try (Connection conn = Database_Connection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int invoiceId = rs.getInt("id");
+                    Double total = rs.getDouble("tongtien");
+                    LocalDateTime ngaylap = rs.getTimestamp("ngaylap").toLocalDateTime();
+
+                    // Trả về đối tượng Invoice bọc trong Optional
+                    return Optional.of(new Invoice(invoiceId, ngaylap, total));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // Trả về Optional rỗng nếu không tìm thấy hoặc có lỗi
+        return Optional.empty();
     }
 }
  

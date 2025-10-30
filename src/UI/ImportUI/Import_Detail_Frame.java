@@ -72,7 +72,6 @@ public class Import_Detail_Frame extends Base_Frame {
         // ======= Sự kiện =======
         btn_Back.addActionListener(e -> {
             dispose();
-            new Import_Frame().setVisible(true);
         });
 
         // ======= Load dữ liệu =======
