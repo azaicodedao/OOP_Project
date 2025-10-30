@@ -26,7 +26,7 @@ public class Import_Detail_Frame extends Base_Frame {
         this.idPhieuNhap = idPhieuNhap;
 
         setTitle("Chi tiết phiếu nhập #" + idPhieuNhap);
-        setSize(950, 600);
+        setSize(900, 580);
         setLocationRelativeTo(null);
 
         // ======= NORTH - Tiêu đề =======
@@ -38,7 +38,7 @@ public class Import_Detail_Frame extends Base_Frame {
         add(pnlNorth, BorderLayout.NORTH);
 
         // ======= CENTER - Bảng dữ liệu =======
-        String[] columns = {"STT", "ID", "Tên sản phẩm", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
+        String[] columns = {"STT", "Tên sản phẩm", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
         modelTable = new DefaultTableModel(columns, 0);
         tb_ImportDetail = createTable(modelTable);
         JScrollPane scrollPane = createScrollPane(tb_ImportDetail);
@@ -88,7 +88,6 @@ public class Import_Detail_Frame extends Base_Frame {
         for (Import_Detail d : list) {
             modelTable.addRow(new Object[]{
                     stt++,                          // STT
-                    d.getId(),
                     d.getTenSanPham(),
                     d.getSoluong(),
                     d.getGiaNhap(),
