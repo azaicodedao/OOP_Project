@@ -5,21 +5,52 @@ import Model.Import_Detail;
 import java.sql.*;
 import java.util.ArrayList;
 
+//Trần Thanh Tùng
+
 public class Import_Detail_Service {
 
-    // ======= Thêm chi tiết phiếu nhập =======
+    // ======= Thêm chi tiết phiếu nhập và cập nhật kho =======
     public boolean insert(Import_Detail detail) {
-        String sql = "INSERT INTO chitietphieunhap (id_phieunhap, id_sanpham, soluongnhap, gianhap, giaban) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = Database_Connection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String insertSQL = """
+                INSERT INTO chitietphieunhap 
+                (id_phieunhap, id_sanpham, soluongnhap, gianhap, giaban) 
+                VALUES (?, ?, ?, ?, ?)
+                """;
 
-            ps.setInt(1, detail.getId_Import());
-            ps.setInt(2, detail.getId_Product());
-            ps.setInt(3, detail.getSoluong());
-            ps.setDouble(4, detail.getGiaNhap());
-            ps.setDouble(5, detail.getGiaBan());
+        String updateProductSQL = """
+                UPDATE sanpham 
+                SET soluong = soluong + ? 
+                WHERE id = ?
+                """;
 
-            return ps.executeUpdate() > 0;
+        try (Connection conn = Database_Connection.getConnection()) {
+            conn.setAutoCommit(false); // bắt đầu transaction
+
+            try (PreparedStatement psInsert = conn.prepareStatement(insertSQL);
+                 PreparedStatement psUpdate = conn.prepareStatement(updateProductSQL)) {
+
+                // --- Bước 1: Thêm chi tiết phiếu nhập ---
+                psInsert.setInt(1, detail.getId_Import());
+                psInsert.setInt(2, detail.getId_Product());
+                psInsert.setInt(3, detail.getSoluong());
+                psInsert.setDouble(4, detail.getGiaNhap());
+                psInsert.setDouble(5, detail.getGiaBan());
+                psInsert.executeUpdate();
+
+                // --- Bước 2: Cập nhật số lượng sản phẩm ---
+                psUpdate.setInt(1, detail.getSoluong());
+                psUpdate.setInt(2, detail.getId_Product());
+                psUpdate.executeUpdate();
+
+                // --- Xác nhận transaction ---
+                conn.commit();
+                return true;
+
+            } catch (SQLException e) {
+                conn.rollback(); // nếu lỗi thì hoàn tác
+                e.printStackTrace();
+                return false;
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -27,7 +58,7 @@ public class Import_Detail_Service {
         }
     }
 
-    // ======= Lấy danh sách chi tiết theo ID phiếu nhập =======
+    // ======= Lấy danh sách chi tiết phiếu nhập theo ID phiếu =======
     public ArrayList<Import_Detail> getById(int idPhieuNhap) {
         ArrayList<Import_Detail> list = new ArrayList<>();
         String sql = """
