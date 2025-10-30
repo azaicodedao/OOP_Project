@@ -10,6 +10,7 @@ import DAO.Service.ImportSEV.Import_Detail_Service;
 import DAO.Service.ProductSEV.Product_Service;
 import UI.Base_Frame;
 import UI.ProductUI.Product_Manage_Frame;
+import UI.MoneyFormat;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -84,27 +85,23 @@ public class Import_Frame extends Base_Frame {
         // ====== Panel Center - Bảng hiển thị sản phẩm ======
         String[] columns = {"STT", "Mã SP", "Tên SP", "Đơn vị", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
         modelTable = new DefaultTableModel(columns, 0) {
-            // Make cells editable only for quantity/giaNhap/giaBan if you want:
             @Override
             public boolean isCellEditable(int row, int column) {
-                // disable direct editing (we add via form)
                 return false;
             }
         };
         tb_Import = createTable(modelTable);
 
-        // Renderer để STT tự động hiển thị theo dòng
         DefaultTableCellRenderer sttRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(
                     JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                label.setText(String.valueOf(row + 1)); // STT tự động tăng
+                label.setText(String.valueOf(row + 1));
                 label.setHorizontalAlignment(SwingConstants.CENTER);
                 return label;
             }
         };
-        // set STT renderer and preferred width
         tb_Import.getColumnModel().getColumn(0).setCellRenderer(sttRenderer);
         tb_Import.getColumnModel().getColumn(0).setPreferredWidth(40);
 
@@ -116,7 +113,6 @@ public class Import_Frame extends Base_Frame {
         pnlSouth.setBackground(background_color);
         pnlSouth.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // --- Nhóm nút ---
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
         pnlButtons.setBackground(background_color);
 
@@ -124,7 +120,6 @@ public class Import_Frame extends Base_Frame {
         btn_Back = createButton20("Bảng sản phẩm");
         btn_ViewDetail = createButton20("Xem chi tiết phiếu nhập");
 
-        //Đặt kích thước cho nút để đủ chỗ hiển thị chữ
         btn_Import.setPreferredSize(new Dimension(150, 40));
         btn_Back.setPreferredSize(new Dimension(180, 40));
         btn_ViewDetail.setPreferredSize(new Dimension(270, 40));
@@ -133,14 +128,13 @@ public class Import_Frame extends Base_Frame {
         pnlButtons.add(btn_ViewDetail);
         pnlButtons.add(btn_Back);
 
-        // --- Tổng tiền ---
         JPanel pnlTotal = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         pnlTotal.setBackground(background_color);
 
         lb_Tongtien = createLabel("Tổng tiền:");
         txt_Display = createTextField();
         txt_Display.setEditable(false);
-        txt_Display.setPreferredSize(new Dimension(150, 30));
+        txt_Display.setPreferredSize(new Dimension(160, 30));
 
         pnlTotal.add(lb_Tongtien);
         pnlTotal.add(txt_Display);
@@ -149,8 +143,8 @@ public class Import_Frame extends Base_Frame {
         pnlSouth.add(pnlTotal, BorderLayout.EAST);
         add(pnlSouth, BorderLayout.SOUTH);
 
-        // ====== Gọi hàm dữ liệu và sự kiện ======
         LoadData();
+
         btn_Import.addActionListener(e -> Import_Product());
         btn_Back.addActionListener(e -> Back());
         btn_Add.addActionListener(e -> Add_Product());
@@ -159,22 +153,17 @@ public class Import_Frame extends Base_Frame {
         setVisible(true);
     }
 
-    // ====== Load sản phẩm lên combobox ======
     private void LoadData() {
         ArrayList<Product> list = product_service.getAll();
         cb_Product.removeAllItems();
-        for (Product p : list) {
-            cb_Product.addItem(p);
-        }
+        for (Product p : list) cb_Product.addItem(p);
     }
 
-    // ====== Quay lại ======
     private void Back() {
         dispose();
         new Product_Manage_Frame();
     }
 
-    // ====== Thêm sản phẩm vào bảng ======
     private void Add_Product() {
         Product selectedProduct = (Product) cb_Product.getSelectedItem();
         if (selectedProduct == null) {
@@ -189,19 +178,18 @@ public class Import_Frame extends Base_Frame {
             double thanhTien = soLuong * giaNhap;
 
             modelTable.addRow(new Object[]{
-                    null, // STT sẽ tự động hiển thị
+                    null,
                     selectedProduct.getId(),
                     selectedProduct.getTenSP(),
                     selectedProduct.getDonvi(),
                     soLuong,
-                    giaNhap,
-                    giaBan,
-                    thanhTien
+                    MoneyFormat.format(giaNhap),
+                    MoneyFormat.format(giaBan),
+                    MoneyFormat.format(thanhTien)
             });
 
             updateTotal();
 
-            // clear inputs (optional)
             txt_SoLuong.setText("");
             txt_GiaNhap.setText("");
             txt_GiaBan.setText("");
@@ -212,22 +200,15 @@ public class Import_Frame extends Base_Frame {
         }
     }
 
-    // ====== Cập nhật tổng tiền ======
     private void updateTotal() {
         double tong = 0;
         for (int i = 0; i < modelTable.getRowCount(); i++) {
             Object v = modelTable.getValueAt(i, 7);
-            if (v instanceof Number) tong += ((Number) v).doubleValue();
-            else {
-                try {
-                    tong += Double.parseDouble(String.valueOf(v));
-                } catch (Exception ignored) {}
-            }
+            tong += MoneyFormat.parse(String.valueOf(v));
         }
-        txt_Display.setText(String.format("%,.0f VND", tong));
+        txt_Display.setText(MoneyFormat.format(tong));
     }
 
-    // ====== Xử lý nhập hàng ======
     private void Import_Product() {
         try {
             int rowCount = modelTable.getRowCount();
@@ -237,22 +218,14 @@ public class Import_Frame extends Base_Frame {
             }
 
             double tongTien = 0;
-            // Prepare details to insert, but we need phieunhap id first
             ArrayList<Import_Detail> details = new ArrayList<>();
 
             for (int i = 0; i < rowCount; i++) {
-                Object oId = modelTable.getValueAt(i, 1);
-                Object oSoLuong = modelTable.getValueAt(i, 4);
-                Object oGiaNhap = modelTable.getValueAt(i, 5);
-                Object oGiaBan = modelTable.getValueAt(i, 6);
-
-                int idProduct = Integer.parseInt(String.valueOf(oId));
-                int soLuong = Integer.parseInt(String.valueOf(oSoLuong));
-                double giaNhap = Double.parseDouble(String.valueOf(oGiaNhap));
-                double giaBan = Double.parseDouble(String.valueOf(oGiaBan));
+                int idProduct = Integer.parseInt(String.valueOf(modelTable.getValueAt(i, 1)));
+                int soLuong = Integer.parseInt(String.valueOf(modelTable.getValueAt(i, 4)));
+                double giaNhap = MoneyFormat.parse(String.valueOf(modelTable.getValueAt(i, 5)));
+                double giaBan = MoneyFormat.parse(String.valueOf(modelTable.getValueAt(i, 6)));
                 double thanhTien = soLuong * giaNhap;
-                modelTable.setValueAt(thanhTien, i, 7); // ensure total column updated
-
                 tongTien += thanhTien;
 
                 Import_Detail d = new Import_Detail();
@@ -263,7 +236,6 @@ public class Import_Frame extends Base_Frame {
                 details.add(d);
             }
 
-            // Insert phieunhap
             Import imp = new Import(tongTien, LocalDateTime.now());
             boolean inserted = import_service.insert(imp);
             if (!inserted) {
@@ -271,24 +243,20 @@ public class Import_Frame extends Base_Frame {
                 return;
             }
 
-            // Lấy id phiếu nhập mới nhất
             int idPhieuNhapMoi = import_service.getLastInsertId();
             if (idPhieuNhapMoi <= 0) {
                 JOptionPane.showMessageDialog(this, "Không lấy được ID phiếu nhập mới!");
                 return;
             }
 
-            // Insert chi tiết và update kho
             for (Import_Detail d : details) {
                 d.setId_Import(idPhieuNhapMoi);
                 import_detail_service.insert(d);
-                // cập nhật kho (Product_Service.updateImport nên thực thi update trong DB)
                 product_service.updateImport(d.getId_Product(), d.getSoluong(), d.getGiaBan());
             }
 
-            JOptionPane.showMessageDialog(this, "Nhập hàng thành công!");
+            JOptionPane.showMessageDialog(this, "Nhập hàng thành công!\nTổng tiền: " + MoneyFormat.format(tongTien));
 
-            // hỏi người dùng có mở chi tiết ngay không
             int yn = JOptionPane.showConfirmDialog(this,
                     "Mở chi tiết phiếu nhập vừa tạo (ID = " + idPhieuNhapMoi + ")?",
                     "Xem chi tiết", JOptionPane.YES_NO_OPTION);
@@ -299,15 +267,12 @@ public class Import_Frame extends Base_Frame {
             modelTable.setRowCount(0);
             updateTotal();
 
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Dữ liệu số không hợp lệ!");
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi nhập hàng!");
         }
     }
 
-    // Mở Import_Detail theo ID nhập từ dialog
     private void viewDetailByDialog() {
         String s = JOptionPane.showInputDialog(this, "Nhập ID phiếu nhập cần xem:");
         if (s == null || s.trim().isEmpty()) return;
@@ -320,6 +285,6 @@ public class Import_Frame extends Base_Frame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Import_Frame());
+        SwingUtilities.invokeLater(Import_Frame::new);
     }
 }
