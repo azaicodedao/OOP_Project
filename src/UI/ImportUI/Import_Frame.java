@@ -32,6 +32,9 @@ public class Import_Frame extends Base_Frame {
     private final Import_Detail_Service import_detail_service = new Import_Detail_Service();
     private final Product_Service product_service = new Product_Service();
 
+    //Thêm biến lưu lại ID phiếu nhập gần nhất
+    private Integer lastImportId = null;
+
     public Import_Frame() {
         setTitle("Phiếu nhập hàng");
         setSize(1100, 650);
@@ -92,6 +95,7 @@ public class Import_Frame extends Base_Frame {
         };
         tb_Import = createTable(modelTable);
 
+        // STT Renderer
         DefaultTableCellRenderer sttRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(
@@ -145,10 +149,11 @@ public class Import_Frame extends Base_Frame {
 
         LoadData();
 
+        // ====== Gán sự kiện ======
         btn_Import.addActionListener(e -> Import_Product());
         btn_Back.addActionListener(e -> Back());
         btn_Add.addActionListener(e -> Add_Product());
-        btn_ViewDetail.addActionListener(e -> viewDetailByDialog());
+        btn_ViewDetail.addActionListener(e -> viewDetail());
 
         setVisible(true);
     }
@@ -189,7 +194,6 @@ public class Import_Frame extends Base_Frame {
             });
 
             updateTotal();
-
             txt_SoLuong.setText("");
             txt_GiaNhap.setText("");
             txt_GiaBan.setText("");
@@ -249,6 +253,9 @@ public class Import_Frame extends Base_Frame {
                 return;
             }
 
+            //Lưu lại ID phiếu nhập mới nhất
+            lastImportId = idPhieuNhapMoi;
+
             for (Import_Detail d : details) {
                 d.setId_Import(idPhieuNhapMoi);
                 import_detail_service.insert(d);
@@ -256,13 +263,6 @@ public class Import_Frame extends Base_Frame {
             }
 
             JOptionPane.showMessageDialog(this, "Nhập hàng thành công!\nTổng tiền: " + MoneyFormat.format(tongTien));
-
-            int yn = JOptionPane.showConfirmDialog(this,
-                    "Mở chi tiết phiếu nhập vừa tạo (ID = " + idPhieuNhapMoi + ")?",
-                    "Xem chi tiết", JOptionPane.YES_NO_OPTION);
-            if (yn == JOptionPane.YES_OPTION) {
-                new Import_Detail_Frame(idPhieuNhapMoi).setVisible(true);
-            }
 
             modelTable.setRowCount(0);
             updateTotal();
@@ -273,15 +273,14 @@ public class Import_Frame extends Base_Frame {
         }
     }
 
-    private void viewDetailByDialog() {
-        String s = JOptionPane.showInputDialog(this, "Nhập ID phiếu nhập cần xem:");
-        if (s == null || s.trim().isEmpty()) return;
-        try {
-            int id = Integer.parseInt(s.trim());
-            new Import_Detail_Frame(id).setVisible(true);
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "ID không hợp lệ!");
+    // Chỉ xem chi tiết phiếu nhập vừa nhập gần nhất
+    private void viewDetail() {
+        if (lastImportId == null) {
+            JOptionPane.showMessageDialog(this, "Chưa có phiếu nhập nào được tạo trong phiên làm việc này!");
+            return;
         }
+
+        new Import_Detail_Frame(lastImportId).setVisible(true);
     }
 
     public static void main(String[] args) {
