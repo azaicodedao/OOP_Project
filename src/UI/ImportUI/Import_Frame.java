@@ -12,6 +12,7 @@ import UI.Base_Frame;
 import UI.ProductUI.Product_Manage_Frame;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDateTime;
@@ -81,9 +82,24 @@ public class Import_Frame extends Base_Frame {
         add(pnlWest, BorderLayout.WEST);
 
         // ====== Panel Center - Bảng hiển thị sản phẩm ======
-        String[] columns = {"Mã SP", "Tên SP", "Đơn vị", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
+        String[] columns = {"STT", "Mã SP", "Tên SP", "Đơn vị", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
         modelTable = new DefaultTableModel(columns, 0);
         tb_Import = createTable(modelTable);
+
+        // Renderer để STT tự động hiển thị theo dòng
+        DefaultTableCellRenderer sttRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(
+                    JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                label.setText(String.valueOf(row + 1)); // STT tự động tăng
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                return label;
+            }
+        };
+        tb_Import.getColumnModel().getColumn(0).setCellRenderer(sttRenderer);
+        tb_Import.getColumnModel().getColumn(0).setPreferredWidth(40);
+
         JScrollPane scrollPane = createScrollPane(tb_Import);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -98,6 +114,10 @@ public class Import_Frame extends Base_Frame {
 
         btn_Import = createButton20("Nhập hàng");
         btn_Back = createButton20("Bảng sản phẩm");
+
+        //Đặt kích thước cho nút để đủ chỗ hiển thị chữ
+        btn_Import.setPreferredSize(new Dimension(150, 40));
+        btn_Back.setPreferredSize(new Dimension(180, 40));
 
         pnlButtons.add(btn_Import);
         pnlButtons.add(btn_Back);
@@ -124,7 +144,6 @@ public class Import_Frame extends Base_Frame {
         btn_Back.addActionListener(e -> Back());
         btn_Add.addActionListener(e -> Add_Product());
 
-        // ====== Hiển thị giao diện ======
         setVisible(true);
     }
 
@@ -158,6 +177,7 @@ public class Import_Frame extends Base_Frame {
             double thanhTien = soLuong * giaNhap;
 
             modelTable.addRow(new Object[]{
+                    null, // STT sẽ tự động hiển thị
                     selectedProduct.getId(),
                     selectedProduct.getTenSP(),
                     selectedProduct.getDonvi(),
@@ -179,9 +199,9 @@ public class Import_Frame extends Base_Frame {
     private void updateTotal() {
         double tong = 0;
         for (int i = 0; i < modelTable.getRowCount(); i++) {
-            tong += (double) modelTable.getValueAt(i, 6);
+            tong += (double) modelTable.getValueAt(i, 7);
         }
-        txt_Display.setText(String.valueOf(tong));
+        txt_Display.setText(String.format("%.0f VND", tong));
     }
 
     // ====== Xử lý nhập hàng ======
@@ -195,7 +215,7 @@ public class Import_Frame extends Base_Frame {
 
             double tongTien = 0;
             for (int i = 0; i < rowCount; i++) {
-                tongTien += (double) modelTable.getValueAt(i, 6);
+                tongTien += (double) modelTable.getValueAt(i, 7);
             }
 
             Import imp = new Import(tongTien, LocalDateTime.now());
@@ -206,10 +226,10 @@ public class Import_Frame extends Base_Frame {
             }
 
             for (int i = 0; i < rowCount; i++) {
-                int idProduct = (int) modelTable.getValueAt(i, 0);
-                int soLuong = (int) modelTable.getValueAt(i, 3);
-                double giaNhap = (double) modelTable.getValueAt(i, 4);
-                double giaBan = (double) modelTable.getValueAt(i, 5);
+                int idProduct = (int) modelTable.getValueAt(i, 1);
+                int soLuong = (int) modelTable.getValueAt(i, 4);
+                double giaNhap = (double) modelTable.getValueAt(i, 5);
+                double giaBan = (double) modelTable.getValueAt(i, 6);
 
                 Import_Detail detail = new Import_Detail();
                 detail.setId_Import(0);
@@ -219,6 +239,7 @@ public class Import_Frame extends Base_Frame {
                 detail.setGiaBan(giaBan);
 
                 import_detail_service.insert(detail);
+                product_service.updateImport(idProduct, soLuong, giaBan);
             }
 
             JOptionPane.showMessageDialog(this, "Nhập hàng thành công!");
