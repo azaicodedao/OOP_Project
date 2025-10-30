@@ -5,6 +5,7 @@ package UI.ImportUI;
 import Model.Import_Detail;
 import DAO.Service.ImportSEV.Import_Detail_Service;
 import UI.Base_Frame;
+import UI.MoneyFormat; //thêm để định dạng tiền
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -20,7 +21,7 @@ public class Import_Detail_Frame extends Base_Frame {
     private JTextField txt_TongTien;
     private final Import_Detail_Service detail_service = new Import_Detail_Service();
 
-    private int idPhieuNhap; // 🟩 ID phiếu nhập được truyền vào
+    private int idPhieuNhap; // ID phiếu nhập được truyền vào
 
     public Import_Detail_Frame(int idPhieuNhap) {
         this.idPhieuNhap = idPhieuNhap;
@@ -83,25 +84,24 @@ public class Import_Detail_Frame extends Base_Frame {
         ArrayList<Import_Detail> list = detail_service.getById(idPhieuNhap);
         modelTable.setRowCount(0);
         double tongTien = 0;
-        int stt = 1; // 🟩 biến đếm STT
+        int stt = 1;
 
         for (Import_Detail d : list) {
             modelTable.addRow(new Object[]{
-                    stt++,                          // STT
+                    stt++,
                     d.getTenSanPham(),
                     d.getSoluong(),
-                    d.getGiaNhap(),
-                    d.getGiaBan(),
-                    d.getThanhTien()
+                    MoneyFormat.format(d.getGiaNhap()), // dùng MoneyFormat
+                    MoneyFormat.format(d.getGiaBan()),
+                    MoneyFormat.format(d.getThanhTien())
             });
             tongTien += d.getThanhTien();
         }
 
-        txt_TongTien.setText(String.format("%,.0f", tongTien)); // Định dạng có dấu phẩy
+        txt_TongTien.setText(MoneyFormat.format(tongTien)); // định dạng tổng tiền
     }
 
-    // Dùng để test riêng frame này
     public static void main(String[] args) {
-        new Import_Detail_Frame(1).setVisible(true); // ví dụ mở phiếu nhập có ID = 1
+        new Import_Detail_Frame(1).setVisible(true);
     }
 }
