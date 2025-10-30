@@ -10,6 +10,8 @@ public class Import_Detail {
     private double giaBan;
     private double thanhTien;
 
+    //Trần Thanh Tùng
+
     public Import_Detail() {}
 
     public Import_Detail(int id_Import, int id_Product, int soluong, double giaNhap, double giaBan) {

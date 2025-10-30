@@ -38,7 +38,7 @@ public class Import_Detail_Frame extends Base_Frame {
         add(pnlNorth, BorderLayout.NORTH);
 
         // ======= CENTER - Bảng dữ liệu =======
-        String[] columns = {"ID", "Tên sản phẩm", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
+        String[] columns = {"STT", "ID", "Tên sản phẩm", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
         modelTable = new DefaultTableModel(columns, 0);
         tb_ImportDetail = createTable(modelTable);
         JScrollPane scrollPane = createScrollPane(tb_ImportDetail);
@@ -83,9 +83,11 @@ public class Import_Detail_Frame extends Base_Frame {
         ArrayList<Import_Detail> list = detail_service.getById(idPhieuNhap);
         modelTable.setRowCount(0);
         double tongTien = 0;
+        int stt = 1; // 🟩 biến đếm STT
 
         for (Import_Detail d : list) {
             modelTable.addRow(new Object[]{
+                    stt++,                          // STT
                     d.getId(),
                     d.getTenSanPham(),
                     d.getSoluong(),
