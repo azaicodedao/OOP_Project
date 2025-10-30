@@ -78,4 +78,20 @@ public class Import_Service{
         }
         return list;
     }
+
+    public int getLastInsertId(){
+        String sql = "SELECT id FROM phieunhap ORDER BY id DESC LIMIT 1";
+        try(Connection con = Database_Connection.getConnection();
+            PreparedStatement pstmt = con.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery()){
+
+            if(rs.next()){
+                return rs.getInt("id");
+            }
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return -1;
+    }
 }
