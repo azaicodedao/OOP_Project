@@ -17,17 +17,11 @@ public class Import_Detail_Service {
                 VALUES (?, ?, ?, ?, ?)
                 """;
 
-        String updateProductSQL = """
-                UPDATE sanpham 
-                SET soluong = soluong + ? 
-                WHERE id = ?
-                """;
-
         try (Connection conn = Database_Connection.getConnection()) {
             conn.setAutoCommit(false); // bắt đầu transaction
 
             try (PreparedStatement psInsert = conn.prepareStatement(insertSQL);
-                 PreparedStatement psUpdate = conn.prepareStatement(updateProductSQL)) {
+                 ) {
 
                 // --- Bước 1: Thêm chi tiết phiếu nhập ---
                 psInsert.setInt(1, detail.getId_Import());
@@ -36,11 +30,6 @@ public class Import_Detail_Service {
                 psInsert.setDouble(4, detail.getGiaNhap());
                 psInsert.setDouble(5, detail.getGiaBan());
                 psInsert.executeUpdate();
-
-                // --- Bước 2: Cập nhật số lượng sản phẩm ---
-                psUpdate.setInt(1, detail.getSoluong());
-                psUpdate.setInt(2, detail.getId_Product());
-                psUpdate.executeUpdate();
 
                 // --- Xác nhận transaction ---
                 conn.commit();
