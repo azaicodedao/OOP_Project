@@ -10,7 +10,7 @@ import java.awt.*;
 
 // Nguyễn Trung Nghĩa
 
-public class Home_Frame extends JFrame{
+public class Home_Frame extends Base_Frame{
 
     JButton qlspButton, tao_gio_hangButton, btn_Import_List, btn_Invoice_List, exitButton;
     JLabel title, footerLabel;
@@ -137,15 +137,11 @@ public class Home_Frame extends JFrame{
         panel.add(Box.createRigidArea(new Dimension(0, 5)));
         panel.add(exitButton);
 
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("PHẦN MỀM QUẢN LÝ BÁN HÀNG");
-        setSize(900, 600);
-        getContentPane().setBackground(new Color(0xE0F2F1));
         setLayout(new BorderLayout());
         add(title, BorderLayout.NORTH);
         add(panel, BorderLayout.CENTER);
         add(footerLabel, BorderLayout.SOUTH);
-        setLocationRelativeTo(null);
         setVisible(true);
     }
 
