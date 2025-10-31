@@ -64,7 +64,7 @@ public class Invoice_Service {
     public int insert(Invoice invoice){
         String sql = "insert into hoadon(tongtien,ngaylap) values(?,?)";
         try(Connection conn = Database_Connection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)){
+            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setDouble(1,invoice.getTotal());
             ps.setTimestamp(2, Timestamp.valueOf(invoice.getDate()));
