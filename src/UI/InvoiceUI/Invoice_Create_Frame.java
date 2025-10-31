@@ -40,8 +40,8 @@ public class Invoice_Create_Frame extends Base_Frame {
 
         // --- 1. Tiêu đề (NORTH) ---
         headerLabel = new JLabel("GIỎ HÀNG SẢN PHẨM", SwingConstants.CENTER);
-        headerLabel.setFont(new Font("Poppins", Font.BOLD, 32));
-        headerLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
+        headerLabel.setFont(new Font("Poppins", Font.BOLD, 40));
+        headerLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
         headerLabel.setBackground(background_color);
         headerLabel.setOpaque(true);
         add(headerLabel, BorderLayout.NORTH);
@@ -52,8 +52,6 @@ public class Invoice_Create_Frame extends Base_Frame {
 
         // Thiết lập JComboBox
         cb_Product = createComboBox();
-        cb_Product.setPreferredSize(new Dimension(150, 30));
-        cb_Product.setFont(new Font("Inter", Font.PLAIN, 20));
 
         // Trường nhập số lượng đơn giản
         JTextField txt_input_soluong = createTextField();
@@ -64,11 +62,9 @@ public class Invoice_Create_Frame extends Base_Frame {
         btn_Add = createButton16("Thêm");
         btn_Delete = createButton16("Xóa");
 
-        // LABEL CỠ CHỮ 20 IN ĐẬM
+        // LABEL
         JLabel productLabel = createLabel("Sản phẩm:");
-        productLabel.setFont(new Font("Inter", Font.BOLD, 20));
         JLabel quantityLabel = createLabel("Số lượng:");
-        quantityLabel.setFont(new Font("Inter", Font.BOLD, 20));
 
         pnl_center_top.add(productLabel);
         pnl_center_top.add(cb_Product);
