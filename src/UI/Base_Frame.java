@@ -19,6 +19,7 @@ public class Base_Frame extends JFrame {
 
     public Base_Frame() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setIconImage((new ImageIcon("image/logo.png")).getImage());
         setSize(900, 650);
         setLocationRelativeTo(null);
         getContentPane().setBackground(background_color);
