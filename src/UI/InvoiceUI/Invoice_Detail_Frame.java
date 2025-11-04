@@ -86,9 +86,12 @@ public class Invoice_Detail_Frame extends Base_Frame {
         };
         tb_invoice_detail = createTable(model_detail); // SỬ DỤNG createTable
 
-        // SỬ DỤNG center_Renderer TỪ Base_Frame
         for (int i = 0; i < tb_invoice_detail.getColumnCount(); i++) {
-            tb_invoice_detail.getColumnModel().getColumn(i).setCellRenderer(center_Renderer);
+            if (i == 3) {
+                tb_invoice_detail.getColumnModel().getColumn(i).setCellRenderer(right_Renderer);
+            } else {
+                tb_invoice_detail.getColumnModel().getColumn(i).setCellRenderer(center_Renderer);
+            }
         }
 
         // Căn giữa và in đậm tiêu đề
