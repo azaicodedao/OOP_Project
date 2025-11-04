@@ -74,7 +74,7 @@ public class Import_List_Frame extends Base_Frame {
 
         // Căn giữa hoặc phải cho các cột
         table.getColumnModel().getColumn(0).setCellRenderer(center_Renderer);
-        table.getColumnModel().getColumn(1).setCellRenderer(center_Renderer);
+        table.getColumnModel().getColumn(1).setCellRenderer(right_Renderer);
         table.getColumnModel().getColumn(2).setCellRenderer(center_Renderer);
 
         // Sự kiện click vào hàng
