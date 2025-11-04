@@ -13,8 +13,7 @@ import UI.ProductUI.Product_Manage_Frame;
 import UI.MoneyFormat;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,7 +31,6 @@ public class Import_Frame extends Base_Frame {
     private final Import_Detail_Service import_detail_service = new Import_Detail_Service();
     private final Product_Service product_service = new Product_Service();
 
-    //Thêm biến lưu lại ID phiếu nhập gần nhất
     private Integer lastImportId = null;
 
     public Import_Frame() {
@@ -42,7 +40,7 @@ public class Import_Frame extends Base_Frame {
         setLayout(new BorderLayout(10, 10));
         setLocationRelativeTo(null);
 
-        // ====== Panel North - Tiêu đề ======
+        // Panel North - Tiêu đề
         JPanel pnlNorth = new JPanel();
         pnlNorth.setBackground(background_color);
         JLabel lb_header = createLabel("BẢNG NHẬP LIỆU");
@@ -50,7 +48,7 @@ public class Import_Frame extends Base_Frame {
         pnlNorth.add(lb_header);
         add(pnlNorth, BorderLayout.NORTH);
 
-        // ====== Panel West - Nhập thông tin sản phẩm ======
+        // Panel West - Nhập thông tin sản phẩm
         JPanel pnlWest = new JPanel();
         pnlWest.setLayout(new BoxLayout(pnlWest, BoxLayout.Y_AXIS));
         pnlWest.setBackground(new Color(0xDCE6F1));
@@ -85,34 +83,41 @@ public class Import_Frame extends Base_Frame {
 
         add(pnlWest, BorderLayout.WEST);
 
-        // ====== Panel Center - Bảng hiển thị sản phẩm ======
-        String[] columns = {"STT", "Mã SP", "Tên SP", "Đơn vị", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
+        // Panel Center - Bảng hiển thị sản phẩm
+        String[] columns = {"Mã SP", "Tên SP", "Đơn vị", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
         modelTable = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        tb_Import = createTable(modelTable);
 
-        // STT Renderer
-        DefaultTableCellRenderer sttRenderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(
-                    JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                label.setText(String.valueOf(row + 1));
-                label.setHorizontalAlignment(SwingConstants.CENTER);
-                return label;
-            }
-        };
-        tb_Import.getColumnModel().getColumn(0).setCellRenderer(sttRenderer);
-        tb_Import.getColumnModel().getColumn(0).setPreferredWidth(40);
+        tb_Import = createTable(modelTable);
+        tb_Import.setRowHeight(25);
+        tb_Import.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        tb_Import.getTableHeader().setBackground(new Color(0xE6EEF8));
+        tb_Import.getTableHeader().setForeground(Color.BLACK);
+        tb_Import.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        tb_Import.setGridColor(Color.LIGHT_GRAY);
+        tb_Import.setSelectionBackground(new Color(220, 235, 245));
+
+        // Căn giữa nội dung trong bảng
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // Căn giữa cho toàn bộ cột
+        for (int i = 0; i < tb_Import.getColumnCount(); i++) {
+            tb_Import.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
+        // Căn giữa tiêu đề
+        ((DefaultTableCellRenderer) tb_Import.getTableHeader().getDefaultRenderer())
+                .setHorizontalAlignment(SwingConstants.CENTER);
 
         JScrollPane scrollPane = createScrollPane(tb_Import);
         add(scrollPane, BorderLayout.CENTER);
 
-        // ====== Panel South - Nút chức năng và tổng tiền ======
+        // Panel South - Nút chức năng và tổng tiền
         JPanel pnlSouth = new JPanel(new BorderLayout());
         pnlSouth.setBackground(background_color);
         pnlSouth.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -149,7 +154,7 @@ public class Import_Frame extends Base_Frame {
 
         LoadData();
 
-        // ====== Gán sự kiện ======
+        // Gán sự kiện
         btn_Import.addActionListener(e -> Import_Product());
         btn_Back.addActionListener(e -> Back());
         btn_Add.addActionListener(e -> Add_Product());
@@ -183,7 +188,6 @@ public class Import_Frame extends Base_Frame {
             double thanhTien = soLuong * giaNhap;
 
             modelTable.addRow(new Object[]{
-                    null,
                     selectedProduct.getId(),
                     selectedProduct.getTenSP(),
                     selectedProduct.getDonvi(),
@@ -207,7 +211,7 @@ public class Import_Frame extends Base_Frame {
     private void updateTotal() {
         double tong = 0;
         for (int i = 0; i < modelTable.getRowCount(); i++) {
-            Object v = modelTable.getValueAt(i, 7);
+            Object v = modelTable.getValueAt(i, 6);
             tong += MoneyFormat.parse(String.valueOf(v));
         }
         txt_Display.setText(MoneyFormat.format(tong));
@@ -225,10 +229,10 @@ public class Import_Frame extends Base_Frame {
             ArrayList<Import_Detail> details = new ArrayList<>();
 
             for (int i = 0; i < rowCount; i++) {
-                int idProduct = Integer.parseInt(String.valueOf(modelTable.getValueAt(i, 1)));
-                int soLuong = Integer.parseInt(String.valueOf(modelTable.getValueAt(i, 4)));
-                double giaNhap = MoneyFormat.parse(String.valueOf(modelTable.getValueAt(i, 5)));
-                double giaBan = MoneyFormat.parse(String.valueOf(modelTable.getValueAt(i, 6)));
+                int idProduct = Integer.parseInt(String.valueOf(modelTable.getValueAt(i, 0)));
+                int soLuong = Integer.parseInt(String.valueOf(modelTable.getValueAt(i, 3)));
+                double giaNhap = MoneyFormat.parse(String.valueOf(modelTable.getValueAt(i, 4)));
+                double giaBan = MoneyFormat.parse(String.valueOf(modelTable.getValueAt(i, 5)));
                 double thanhTien = soLuong * giaNhap;
                 tongTien += thanhTien;
 
@@ -253,7 +257,6 @@ public class Import_Frame extends Base_Frame {
                 return;
             }
 
-            //Lưu lại ID phiếu nhập mới nhất
             lastImportId = idPhieuNhapMoi;
 
             for (Import_Detail d : details) {
@@ -273,7 +276,6 @@ public class Import_Frame extends Base_Frame {
         }
     }
 
-    // Chỉ xem chi tiết phiếu nhập vừa nhập gần nhất
     private void viewDetail() {
         if (lastImportId == null) {
             JOptionPane.showMessageDialog(this, "Chưa có phiếu nhập nào được tạo trong phiên làm việc này!");
