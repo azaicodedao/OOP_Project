@@ -1,7 +1,6 @@
 package UI.ImportUI;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -108,11 +107,6 @@ public class Import_List_Frame extends Base_Frame {
         buttonPanel.add(btn_Refresh);
 
         // Layout chính
-        setLayout(new BorderLayout());
-        add(titleLabel, BorderLayout.NORTH);
-        add(filterPanel, BorderLayout.CENTER); // Đặt filterPanel ở giữa
-        add(scrollPane, BorderLayout.CENTER); // ScrollPane sẽ chiếm phần còn lại
-        add(buttonPanel, BorderLayout.SOUTH);
 
         // Sửa lại layout để filterPanel nằm trên scrollPane
         JPanel centerPanel = new JPanel(new BorderLayout());
