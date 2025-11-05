@@ -88,7 +88,7 @@ public class Product_Manage_Frame extends Base_Frame {
         // Căn độ rộng các cột
         tbProduct.getColumnModel().getColumn(0).setMaxWidth(35);
         tbProduct.getColumnModel().getColumn(1).setMinWidth(200);
-        tbProduct.getColumnModel().getColumn(2).setMaxWidth(50);
+        tbProduct.getColumnModel().getColumn(2).setMaxWidth(70);
         tbProduct.getColumnModel().getColumn(4).setMaxWidth(100);
         //  Căn nội dung các cột
         tbProduct.getColumnModel().getColumn(0).setCellRenderer(center_Renderer);
