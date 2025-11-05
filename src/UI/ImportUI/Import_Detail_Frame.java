@@ -21,7 +21,7 @@ public class Import_Detail_Frame extends Base_Frame {
     private JTextField txt_TongTien;
     private final Import_Detail_Service detail_service = new Import_Detail_Service();
 
-    private int idPhieuNhap; // ID phiếu nhập được truyền vào
+    private int idPhieuNhap; 
 
     public Import_Detail_Frame(int idPhieuNhap) {
         this.idPhieuNhap = idPhieuNhap;
