@@ -148,7 +148,6 @@ public class Home_Frame extends Base_Frame{
     private void qlsp(){
         dispose();
         try{
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             new Product_Manage_Frame();
         } catch (Exception e){
             System.out.println("Chuyển frame sang qlsp bị lỗi");
@@ -158,7 +157,6 @@ public class Home_Frame extends Base_Frame{
     private void tao_gio_hang(){
         dispose();
         try{
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             new Invoice_Create_Frame();
         } catch (Exception e){
             System.out.println("Chuyển frame sang tạo giỏ hàng bị lỗi");
@@ -168,7 +166,6 @@ public class Home_Frame extends Base_Frame{
     private void Import_List(){
         dispose();
         try{
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             new Import_List_Frame();
         } catch (Exception e){
             System.out.println("Chuyển frame sang xem danh sách phiếu nhập bị lỗi");
@@ -178,7 +175,6 @@ public class Home_Frame extends Base_Frame{
     private void Invoice_List(){
         dispose();
         try{
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             new Invoice_List_Frame();
         } catch (Exception e){
             System.out.println("Chuyển frame sang xem danh sách hóa đơn bị lỗi");
