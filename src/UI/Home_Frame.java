@@ -182,6 +182,7 @@ public class Home_Frame extends Base_Frame{
     }
 
     private void exit(){
+        UIManager.put("OptionPane.messageFont", new Font("Inter", Font.PLAIN, 16));
         int result = JOptionPane.showConfirmDialog(this,
                 "Bạn có muốn thoát không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.YES_OPTION) {
