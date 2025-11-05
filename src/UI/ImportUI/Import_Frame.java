@@ -25,7 +25,7 @@ public class Import_Frame extends Base_Frame {
     private DefaultTableModel modelTable;
     private JLabel lb_Tongtien, lb_Product, lb_SoLuong, lb_GiaNhap, lb_GiaBan;
     private JTextField txt_SoLuong, txt_GiaNhap, txt_GiaBan, txt_Display;
-    private JButton btn_Import, btn_Back, btn_Add, btn_ViewDetail, btn_Delete; 
+    private JButton btn_Import, btn_Back, btn_Add, btn_ViewDetail, btn_Delete;
 
     private final Import_Service import_service = new Import_Service();
     private final Import_Detail_Service import_detail_service = new Import_Detail_Service();
@@ -96,17 +96,17 @@ public class Import_Frame extends Base_Frame {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
-            }
+            } //Không cho người đúng sửa trực tiếp trong bảng
         };
 
         tb_Import = createTable(modelTable);
-        tb_Import.setRowHeight(25);
-        tb_Import.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-        tb_Import.getTableHeader().setBackground(new Color(0xE6EEF8));
-        tb_Import.getTableHeader().setForeground(Color.BLACK);
-        tb_Import.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        tb_Import.setGridColor(Color.LIGHT_GRAY);
-        tb_Import.setSelectionBackground(new Color(220, 235, 245));
+        tb_Import.getColumnModel().getColumn(0).setMaxWidth(70);
+        tb_Import.getColumnModel().getColumn(1).setMinWidth(100);
+        tb_Import.getColumnModel().getColumn(2).setMaxWidth(70);
+        tb_Import.getColumnModel().getColumn(3).setMinWidth(80);
+        tb_Import.getColumnModel().getColumn(4).setMinWidth(120);
+        tb_Import.getColumnModel().getColumn(5).setMinWidth(120);
+        tb_Import.getColumnModel().getColumn(6).setMinWidth(120);
 
         // Căn giữa nội dung trong bảng
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -159,7 +159,7 @@ public class Import_Frame extends Base_Frame {
 
         // Gán sự kiện
         btn_Add.addActionListener(e -> Add_Product());
-        btn_Delete.addActionListener(e -> deleteSelectedRow()); 
+        btn_Delete.addActionListener(e -> deleteSelectedRow()); // 🔹 Gắn sự kiện Xoá
         btn_Import.addActionListener(e -> Import_Product());
         btn_Back.addActionListener(e -> Back());
         btn_ViewDetail.addActionListener(e -> viewDetail());
