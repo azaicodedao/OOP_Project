@@ -159,7 +159,7 @@ public class Import_Frame extends Base_Frame {
 
         // Gán sự kiện
         btn_Add.addActionListener(e -> Add_Product());
-        btn_Delete.addActionListener(e -> deleteSelectedRow()); // 🔹 Gắn sự kiện Xoá
+        btn_Delete.addActionListener(e -> deleteSelectedRow());
         btn_Import.addActionListener(e -> Import_Product());
         btn_Back.addActionListener(e -> Back());
         btn_ViewDetail.addActionListener(e -> viewDetail());
