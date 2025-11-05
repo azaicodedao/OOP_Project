@@ -25,7 +25,7 @@ public class Import_Frame extends Base_Frame {
     private DefaultTableModel modelTable;
     private JLabel lb_Tongtien, lb_Product, lb_SoLuong, lb_GiaNhap, lb_GiaBan;
     private JTextField txt_SoLuong, txt_GiaNhap, txt_GiaBan, txt_Display;
-    private JButton btn_Import, btn_Back, btn_Add, btn_ViewDetail, btn_Delete; // 🔹 thêm nút Xóa
+    private JButton btn_Import, btn_Back, btn_Add, btn_ViewDetail, btn_Delete; 
 
     private final Import_Service import_service = new Import_Service();
     private final Import_Detail_Service import_detail_service = new Import_Detail_Service();
@@ -159,7 +159,7 @@ public class Import_Frame extends Base_Frame {
 
         // Gán sự kiện
         btn_Add.addActionListener(e -> Add_Product());
-        btn_Delete.addActionListener(e -> deleteSelectedRow()); // 🔹 Gắn sự kiện Xoá
+        btn_Delete.addActionListener(e -> deleteSelectedRow()); 
         btn_Import.addActionListener(e -> Import_Product());
         btn_Back.addActionListener(e -> Back());
         btn_ViewDetail.addActionListener(e -> viewDetail());
