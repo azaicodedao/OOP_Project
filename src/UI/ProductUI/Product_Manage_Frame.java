@@ -12,6 +12,7 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -80,10 +81,15 @@ public class Product_Manage_Frame extends Base_Frame {
             @Override
             // Cột id không được sửa trên bảng
             public boolean isCellEditable(int row, int column) {
-                return column != 1 && column != 0 && column != 4;
+                return column != 0 && column != 4;
             }
         };
         tbProduct = createTable(model);
+        // Căn độ rộng các cột
+        tbProduct.getColumnModel().getColumn(0).setMaxWidth(35);
+        tbProduct.getColumnModel().getColumn(1).setMinWidth(200);
+        tbProduct.getColumnModel().getColumn(2).setMaxWidth(50);
+        tbProduct.getColumnModel().getColumn(4).setMaxWidth(100);
         //  Căn nội dung các cột
         tbProduct.getColumnModel().getColumn(0).setCellRenderer(center_Renderer);
         tbProduct.getColumnModel().getColumn(1).setCellRenderer(center_Renderer);
