@@ -7,15 +7,11 @@ import Model.Invoice;
 import Model.Invoice_Detail;
 import Model.Product;
 import UI.Base_Frame;
-import UI.Home_Frame;
 import UI.MoneyFormat;
-import UI.InvoiceUI.Invoice_List_Frame;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,7 +35,7 @@ public class Invoice_Detail_Frame extends Base_Frame {
         setTitle("Chi tiết hóa đơn ID: " + id_Invoice);
         setLayout(new BorderLayout());
 
-        // --- 1. Tiêu đề (NORTH) ---
+        // Tiêu đề (NORTH)
         JLabel titleLabel = new JLabel("CHI TIẾT HÓA ĐƠN", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Poppins", Font.BOLD, 32));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
@@ -47,7 +43,7 @@ public class Invoice_Detail_Frame extends Base_Frame {
         titleLabel.setOpaque(true);
         add(titleLabel, BorderLayout.NORTH);
 
-        // --- 2. Panel Center_Top (Thông tin Thành tiền & Thời gian) ---
+        // Panel Center_Top (Thông tin Thành tiền & Thời gian)
         JPanel pnl_info_top = createPanelBottom();
         pnl_info_top.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 10));
 
@@ -76,7 +72,7 @@ public class Invoice_Detail_Frame extends Base_Frame {
         pnl_info_top.add(lblThoiGianTitle);
         pnl_info_top.add(lb_Time);
 
-        // --- 3. Bảng (Center) ---
+        // Bảng (Center)
         String[] cols = new String[] { "STT", "Tên sản phẩm", "Đơn vị", "Giá", "Số lượng" };
         model_detail = new DefaultTableModel(cols, 0) {
             @Override
@@ -100,8 +96,8 @@ public class Invoice_Detail_Frame extends Base_Frame {
 
         // Căn giữa và in đậm tiêu đề
         JTableHeader header = tb_invoice_detail.getTableHeader();
-        header.setDefaultRenderer(new SimpleHeaderRenderer(header.getDefaultRenderer()));
-        header.setReorderingAllowed(false);
+        header.setReorderingAllowed(false); // Không cho kéo cột
+        header.setPreferredSize(new Dimension(header.getPreferredSize().width, 35));
 
         JScrollPane scrollPane = createScrollPane(tb_invoice_detail);
 
@@ -112,7 +108,7 @@ public class Invoice_Detail_Frame extends Base_Frame {
 
         add(main_center_panel, BorderLayout.CENTER);
 
-        // --- 4. Panel Bottom (SOUTH) ---
+        // Panel Bottom (SOUTH)
         JPanel pnl_bottom = createPanelBottom(); // SỬ DỤNG createPanel
         pnl_bottom.setLayout(new FlowLayout(FlowLayout.CENTER, 40, 15));
         btn_Back = createButton20("QUAY LẠI"); // SỬ DỤNG createButton20
@@ -130,27 +126,30 @@ public class Invoice_Detail_Frame extends Base_Frame {
     private void LoadData() {
         model_detail.setRowCount(0);
         try {
-            // 1. Lấy thông tin Hóa đơn cha
+            // Lấy thông tin Hóa đơn cha
             Optional<Invoice> invoiceOpt = invoice_service.getInvoiceById(invoiceId);
             if (!invoiceOpt.isPresent()) {
                 JOptionPane.showMessageDialog(this, "Không tìm thấy hóa đơn ID: " + invoiceId, "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             Invoice invoice = invoiceOpt.get();
-
-            // 2. Lấy chi tiết hóa đơn
+            // Lấy chi tiết hóa đơn
             ArrayList<Invoice_Detail> detailList = invoice_detail_service.getAllByInvoiceId(invoiceId);
 
-            // 3. Hiển thị thông tin tổng quát
+            // Hiển thị thông tin tổng quát
             lb_Thanhtien.setText(MoneyFormat.format(invoice.getTotal()));
             lb_Time.setText(invoice.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
 
-            // 4. Điền dữ liệu vào bảng
+            // Điền dữ liệu vào bảng
             int stt = 1;
             for (Invoice_Detail detail : detailList) {
-                Optional<Product> productOpt = product_service.getProductById(detail.getId_Product());
-                String tenSP = productOpt.map(Product::getTenSP).orElse("Không tìm thấy");
-                String donvi = productOpt.map(Product::getDonvi).orElse("N/A");
+                Product product = product_service.getProductById(detail.getId_Product()).orElse(null);
+                String tenSP = "Không tìm thấy";
+                String donvi = "N/A";
+                if (product != null) {
+                    tenSP = product.getTenSP();
+                    donvi = product.getDonvi();
+                }
                 model_detail.addRow(new Object[]{
                         stt++,
                         tenSP,
@@ -170,32 +169,7 @@ public class Invoice_Detail_Frame extends Base_Frame {
         dispose();
     }
 
-    static class SimpleHeaderRenderer implements TableCellRenderer {
-        DefaultTableCellRenderer renderer;
-        private final Color TABLE_HEADER_BACKGROUND = new Color(0xDCE6F1);
-
-        public SimpleHeaderRenderer(TableCellRenderer defaultRenderer) {
-            renderer = (DefaultTableCellRenderer) defaultRenderer;
-            renderer.setHorizontalAlignment(JLabel.CENTER);
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-            Component c = renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-            c.setFont(c.getFont().deriveFont(Font.BOLD));
-            c.setBackground(TABLE_HEADER_BACKGROUND);
-            return c;
-        }
-    }
-
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            new Invoice_Detail_Frame(1);
-        });
+        new Invoice_Detail_Frame(1);
     }
 }

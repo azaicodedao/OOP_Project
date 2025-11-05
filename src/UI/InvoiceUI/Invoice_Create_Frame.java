@@ -9,10 +9,8 @@ import UI.*;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,7 +36,7 @@ public class Invoice_Create_Frame extends Base_Frame {
         setTitle("Giỏ hàng sản phẩm");
         setLayout(new BorderLayout());
 
-        // --- 1. Tiêu đề (NORTH) ---
+        //Tiêu đề (NORTH)
         headerLabel = new JLabel("GIỎ HÀNG SẢN PHẨM", SwingConstants.CENTER);
         headerLabel.setFont(new Font("Poppins", Font.BOLD, 40));
         headerLabel.setBorder(BorderFactory.createEmptyBorder(30, 0, 10, 0));
@@ -46,7 +44,7 @@ public class Invoice_Create_Frame extends Base_Frame {
         headerLabel.setOpaque(true);
         add(headerLabel, BorderLayout.NORTH);
 
-        // --- 2. Panel Center_Top chứa combobox, buttons, ... ---
+        //Panel Center_Top chứa combobox, buttons, ...
         JPanel pnl_center_top = createPanelBottom();
         pnl_center_top.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 10));
 
@@ -73,7 +71,7 @@ public class Invoice_Create_Frame extends Base_Frame {
         pnl_center_top.add(btn_Add);
         pnl_center_top.add(btn_Delete);
 
-        // --- 3. Bảng (Center) ---
+        //Bảng (Center)
         String[] cols = new String[] { "STT", "ID SP (Ẩn)", "Tên Sản Phẩm", "Đơn vị", "Đơn giá", "Số lượng" };
         modelTable = new DefaultTableModel(cols, 0) {
             @Override
@@ -94,21 +92,19 @@ public class Invoice_Create_Frame extends Base_Frame {
         tb_Invoice.getColumnModel().getColumn(4).setCellRenderer(right_Renderer);
         tb_Invoice.getColumnModel().getColumn(5).setCellRenderer(center_Renderer);
 
-        // Cấu hình Header (chỉ đặt chiều cao)
+        tb_Invoice.getColumnModel().getColumn(0).setMaxWidth(40);
+        tb_Invoice.getColumnModel().getColumn(1).setMinWidth(200);
+        tb_Invoice.getColumnModel().getColumn(2).setMinWidth(70);
+        tb_Invoice.getColumnModel().getColumn(4).setMinWidth(150);
+
         JTableHeader header = tb_Invoice.getTableHeader();
-        header.setDefaultRenderer(new SimpleHeaderRenderer(header.getDefaultRenderer()));
-        header.setReorderingAllowed(false);
-        Dimension headerSize = header.getPreferredSize();
-        header.setPreferredSize(new Dimension(headerSize.width, 40));
+        header.setReorderingAllowed(false); // Không cho kéo cột
+        header.setPreferredSize(new Dimension(header.getPreferredSize().width, 35));
 
         // Ẩn cột ID sản phẩm
         tb_Invoice.getColumnModel().getColumn(1).setMinWidth(0);
         tb_Invoice.getColumnModel().getColumn(1).setMaxWidth(0);
         tb_Invoice.getColumnModel().getColumn(1).setWidth(0);
-
-        // ÁP DỤNG TRÌNH SỬA CĂN TRÁI CHO CỘT SỐ LƯỢNG (Index 5)
-        JTextField leftAlignedTextField = new JTextField();
-        tb_Invoice.getColumnModel().getColumn(5).setCellEditor(new LeftAlignEditor(leftAlignedTextField, this, this.product_service));
 
         JScrollPane scrollPane = createScrollPane(tb_Invoice);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 40, 10, 40));
@@ -120,7 +116,7 @@ public class Invoice_Create_Frame extends Base_Frame {
         add(centerPanel, BorderLayout.CENTER);
 
 
-        // --- 4. Panel Bottom (SOUTH) ---
+        //Panel Bottom (SOUTH)
         JPanel pnl_bottom = createPanelBottom();
         pnl_bottom.setLayout(new FlowLayout(FlowLayout.CENTER, 40, 15));
 
@@ -143,7 +139,7 @@ public class Invoice_Create_Frame extends Base_Frame {
 
         add(pnl_bottom, BorderLayout.SOUTH);
 
-        // --- Xử lý sự kiện và Load Dữ liệu ---
+        // Xử lý sự kiện và Load Dữ liệu
         LoadProductsToComboBox();
 
         // ÁP DỤNG SỬA LỖI: BUỘC DỪNG CHỈNH SỬA TRƯỚC KHI THAO TÁC NÚT
@@ -160,13 +156,11 @@ public class Invoice_Create_Frame extends Base_Frame {
                     int row = e.getFirstRow();
                     int col = e.getColumn();
                     if (row >= 0 && col == 5) {
-                        SwingUtilities.invokeLater(() -> Tinhtong());
+                        updateRow(row);
                     }
                 }
             }
         });
-
-        Tinhtong();
         setVisible(true);
     }
 
@@ -181,11 +175,6 @@ public class Invoice_Create_Frame extends Base_Frame {
         String soluongText = inputField.getText().trim();
         int soluongThem;
 
-        if (selectedProduct == null) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm.", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
         try {
             soluongThem = Integer.parseInt(soluongText);
             if (soluongThem <= 0) {
@@ -197,17 +186,11 @@ public class Invoice_Create_Frame extends Base_Frame {
             return;
         }
 
-        // 1. Lấy thông tin tồn kho thực tế
+        //Lấy thông tin tồn kho thực tế
         int productId = selectedProduct.getId();
         Product productInStock = product_service.getProductById(productId).orElse(null);
-
-        if (productInStock == null) {
-            JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin tồn kho cho sản phẩm này.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         int stockQty = productInStock.getSoluong();
-        int existingRow = findProductInTable(productId);
+        int existingRow = findProductInTable(productId); // xác định cần cộng thêm vào số lượng hay thêm dòng mới
         int totalQtyInCart;
         int currentQtyInCart = 0;
 
@@ -242,32 +225,21 @@ public class Invoice_Create_Frame extends Base_Frame {
                     soluongThem
             });
         }
-
         Tinhtong();
         inputField.setText("1");
     }
 
-
     private void Delete_Item() {
-        stopTableEditing();
-
-        int[] selectedRowsView = tb_Invoice.getSelectedRows();
-
+        int[] selectedRows = tb_Invoice.getSelectedRows();
         if (modelTable.getRowCount() == 0) {
             JOptionPane.showMessageDialog(this, "Giỏ hàng rỗng, không có gì để xóa.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-
-        if (selectedRowsView.length > 0) {
-            int[] selectedRowsModel = new int[selectedRowsView.length];
-            for (int i = 0; i < selectedRowsView.length; i++) {
-                selectedRowsModel[i] = tb_Invoice.convertRowIndexToModel(selectedRowsView[i]);
-            }
-
-            int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc xóa " + selectedRowsModel.length + " sản phẩm đã chọn không?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
+        if (selectedRows.length > 0) {
+            int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc xóa " + selectedRows.length + " sản phẩm đã chọn không?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                for (int i = selectedRowsModel.length - 1; i >= 0; i--) {
-                    modelTable.removeRow(selectedRowsModel[i]);
+                for (int i = selectedRows.length - 1; i >= 0; i--) {
+                    modelTable.removeRow(selectedRows[i]);
                 }
                 reNumberTableRows();
                 Tinhtong();
@@ -277,20 +249,12 @@ public class Invoice_Create_Frame extends Base_Frame {
         }
     }
 
-
-
     private void Save_Invoice() {
-        // 1. CHUẨN BỊ VÀ XÁC THỰC
-        stopTableEditing(); // Buộc Commit giá trị trước khi Lưu
-
         if (modelTable.getRowCount() == 0) {
             JOptionPane.showMessageDialog(this, "Giỏ hàng rỗng. Vui lòng thêm sản phẩm trước khi lưu.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         double tongTien = getTongTienValue();
-
-        // Yêu cầu xác nhận từ người dùng
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Xác nhận lưu đơn hàng với tổng tiền: " + MoneyFormat.format(tongTien) + "?\n(Thao tác này sẽ trừ số lượng tồn kho)",
                 "Xác nhận Lưu & Trừ Tồn Kho", JOptionPane.YES_NO_OPTION);
@@ -298,11 +262,9 @@ public class Invoice_Create_Frame extends Base_Frame {
         if (confirm != JOptionPane.YES_OPTION) {
             return;
         }
-
-        // 2. LƯU HÓA ĐƠN VÀ CHI TIẾT (Logic CSDL)
+        // LƯU HÓA ĐƠN VÀ CHI TIẾT (Logic CSDL)
         Invoice newInvoice = new Invoice(tongTien, LocalDateTime.now());
         int newInvoiceId = invoice_service.insert(newInvoice);
-
         if (newInvoiceId > 0) {
             boolean detailsOk = true;
             boolean stockUpdated = true;
@@ -312,45 +274,37 @@ public class Invoice_Create_Frame extends Base_Frame {
                 try {
                     int productId = (int) modelTable.getValueAt(i, 1);
                     double donGia = MoneyFormat.parse((String) modelTable.getValueAt(i, 4));
-
                     // Lấy số lượng an toàn
                     Object soluongObj = modelTable.getValueAt(i, 5);
                     int soluong = Integer.parseInt(soluongObj.toString());
-
-                    // a) LƯU CHI TIẾT HÓA ĐƠN
+                    // LƯU CHI TIẾT HÓA ĐƠN
                     Invoice_Detail detail = new Invoice_Detail(
                             0, newInvoiceId, productId, soluong, donGia, 0.0
                     );
-
                     if (!invoice_detail_service.insert(detail)) {
                         detailsOk = false;
-                        System.err.println("Lỗi khi chèn chi tiết: " + productId);
+                        JOptionPane.showMessageDialog(this,
+                                "Lỗi khi chèn chi tiết sản phẩm có ID: " + productId,
+                                "Lỗi chi tiết hóa đơn", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
-
-                    // b) TRỪ SỐ LƯỢNG TỒN KHO
+                    //TRỪ SỐ LƯỢNG TỒN KHO
                     product_service.updateInvoice(productId, soluong);
-
                 } catch (Exception e) {
                     stockUpdated = false;
-                    System.err.println("LỖI GIAO DỊCH: Không trừ được tồn kho hoặc lỗi khác. " + e.getMessage());
-                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(this,
+                            "LỖI GIAO DỊCH: Không trừ được tồn kho hoặc lỗi khác.\nChi tiết: " + e.getMessage(),
+                            "Lỗi xử lý", JOptionPane.ERROR_MESSAGE);
                     break;
                 }
             }
-
-            // 3. THÔNG BÁO VÀ HOÀN TẤT
+            // THÔNG BÁO VÀ HOÀN TẤT
             if (detailsOk && stockUpdated) {
                 JOptionPane.showMessageDialog(this, "Lưu hóa đơn thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-
                 // Dọn dẹp giao diện
                 modelTable.setRowCount(0);
                 Tinhtong();
-            } else {
-                // Báo cáo lỗi và yêu cầu kiểm tra CSDL
-                JOptionPane.showMessageDialog(this, "LỖI: Xảy ra sự cố khi lưu chi tiết hoặc cập nhật tồn kho.", "Lỗi Nghiệp Vụ", JOptionPane.ERROR_MESSAGE);
             }
-
         } else {
             // Lỗi này xảy ra khi Invoice_Service.insert() trả về -1
             JOptionPane.showMessageDialog(this, "Lưu hóa đơn cha thất bại.", "Lỗi CSDL", JOptionPane.ERROR_MESSAGE);
@@ -408,87 +362,37 @@ public class Invoice_Create_Frame extends Base_Frame {
         }
     }
 
-
-    static class SimpleHeaderRenderer implements TableCellRenderer {
-        DefaultTableCellRenderer renderer;
-
-        public SimpleHeaderRenderer(TableCellRenderer defaultRenderer) {
-            renderer = (DefaultTableCellRenderer) defaultRenderer;
-            renderer.setHorizontalAlignment(JLabel.CENTER);
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-            Component c = renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-            c.setFont(c.getFont().deriveFont(Font.BOLD));
-            return c;
-        }
-    }
-
-    static class LeftAlignEditor extends DefaultCellEditor {
-        Product_Service productService;
-
-        public LeftAlignEditor(JTextField textField, Invoice_Create_Frame frame, Product_Service service) {
-            super(textField);
-            this.productService = service;
-
-            textField.setHorizontalAlignment(JTextField.LEFT);
-            textField.setFont(new Font("Inter", Font.PLAIN, 16));
-
-            textField.addActionListener(e -> {
-                stopCellEditing();
-            });
-        }
-
-        @Override
-        public boolean stopCellEditing() {
-            String text = ((JTextField) getComponent()).getText();
-            int newQty;
-
-            try {
-                newQty = Integer.parseInt(text);
-                if (newQty <= 0) {
-                    JOptionPane.showMessageDialog(null, "Số lượng phải lớn hơn 0.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Số lượng không hợp lệ.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return false;
+    private void updateRow(int row) {
+        try {
+            int productId = (int) modelTable.getValueAt(row, 1);
+            Object soluongObj = modelTable.getValueAt(row, 5);
+            // Kiểm tra nhập số
+            int newQty = Integer.parseInt(soluongObj.toString());
+            if (newQty <= 0) {
+                JOptionPane.showMessageDialog(this, "Số lượng phải lớn hơn 0.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                modelTable.setValueAt(1, row, 5); // tránh lỗi khi tính tổng tiền
+                return;
             }
-
-            // 2. Lấy thông tin tồn kho
-            JTable table = (JTable) getComponent().getParent();
-            int selectedRow = table.getEditingRow();
-
-            if (selectedRow == -1) {
-                return super.stopCellEditing();
-            }
-
-            int productId = (int) table.getModel().getValueAt(selectedRow, 1);
-            Product productInStock = productService.getProductById(productId).orElse(null);
-
-            if (productInStock == null) {
-                JOptionPane.showMessageDialog(null, "Không thể kiểm tra tồn kho.", "Lỗi Tồn Kho", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-
+            // Kiểm tra tồn kho
+            Product productInStock = product_service.getProductById(productId).orElse(null);
+//            if (productInStock == null) {
+//                JOptionPane.showMessageDialog(this, "Không thể kiểm tra tồn kho.", "Lỗi tồn kho", JOptionPane.ERROR_MESSAGE);
+//                return;
+//            }
             int stockQty = productInStock.getSoluong();
-
-            // 3. Kiểm tra Tồn Kho
             if (newQty > stockQty) {
-                JOptionPane.showMessageDialog(null,
+                JOptionPane.showMessageDialog(this,
                         "Không đủ tồn kho! Tối đa có thể đặt là: " + stockQty,
-                        "Lỗi Tồn Kho", JOptionPane.ERROR_MESSAGE);
-
-                // Đặt lại giá trị tối đa vào ô chỉnh sửa
-                ((JTextField) getComponent()).setText(String.valueOf(stockQty));
-                return false; // NGĂN KHÔNG CHO THOÁT EDITOR
+                        "Lỗi tồn kho", JOptionPane.ERROR_MESSAGE);
+                modelTable.setValueAt(stockQty, row, 5);
+                return;
             }
-
-            return super.stopCellEditing();
+            Tinhtong();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Số lượng không hợp lệ.", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
+            modelTable.setValueAt(1, row, 5);
         }
     }
-
 
     public static void main(String[] args) {
         new Invoice_Create_Frame();
