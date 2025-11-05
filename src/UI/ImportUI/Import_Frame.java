@@ -25,7 +25,7 @@ public class Import_Frame extends Base_Frame {
     private DefaultTableModel modelTable;
     private JLabel lb_Tongtien, lb_Product, lb_SoLuong, lb_GiaNhap, lb_GiaBan;
     private JTextField txt_SoLuong, txt_GiaNhap, txt_GiaBan, txt_Display;
-    private JButton btn_Import, btn_Back, btn_Add, btn_ViewDetail;
+    private JButton btn_Import, btn_Back, btn_Add, btn_ViewDetail, btn_Delete; // 🔹 thêm nút Xóa
 
     private final Import_Service import_service = new Import_Service();
     private final Import_Detail_Service import_detail_service = new Import_Detail_Service();
@@ -81,6 +81,13 @@ public class Import_Frame extends Base_Frame {
         btn_Add.setAlignmentX(Component.CENTER_ALIGNMENT);
         pnlWest.add(btn_Add);
 
+        pnlWest.add(Box.createVerticalStrut(10));
+
+        // Nút xóa sản phẩm
+        btn_Delete = createButton16("Xoá sản phẩm");
+        btn_Delete.setAlignmentX(Component.CENTER_ALIGNMENT);
+        pnlWest.add(btn_Delete);
+
         add(pnlWest, BorderLayout.WEST);
 
         // Panel Center - Bảng hiển thị sản phẩm
@@ -104,13 +111,9 @@ public class Import_Frame extends Base_Frame {
         // Căn giữa nội dung trong bảng
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-
-        // Căn giữa cho toàn bộ cột
         for (int i = 0; i < tb_Import.getColumnCount(); i++) {
             tb_Import.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
-
-        // Căn giữa tiêu đề
         ((DefaultTableCellRenderer) tb_Import.getTableHeader().getDefaultRenderer())
                 .setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -155,9 +158,10 @@ public class Import_Frame extends Base_Frame {
         LoadData();
 
         // Gán sự kiện
+        btn_Add.addActionListener(e -> Add_Product());
+        btn_Delete.addActionListener(e -> deleteSelectedRow()); // 🔹 Gắn sự kiện Xoá
         btn_Import.addActionListener(e -> Import_Product());
         btn_Back.addActionListener(e -> Back());
-        btn_Add.addActionListener(e -> Add_Product());
         btn_ViewDetail.addActionListener(e -> viewDetail());
 
         setVisible(true);
@@ -205,6 +209,27 @@ public class Import_Frame extends Base_Frame {
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this,
                     "Vui lòng nhập đúng định dạng:\nVD:\nSố lượng: 20\nGiá nhập: 10000\nGiá bán: 20000");
+        }
+    }
+
+    // Hàm xoá dòng được chọn
+    private void deleteSelectedRow() {
+        int selectedRow = tb_Import.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để xoá!");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Bạn có chắc muốn xoá sản phẩm này?",
+                "Xác nhận xoá",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            modelTable.removeRow(selectedRow);
+            updateTotal();
         }
     }
 
