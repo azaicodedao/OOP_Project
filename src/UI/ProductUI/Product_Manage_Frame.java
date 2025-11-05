@@ -39,7 +39,8 @@ public class Product_Manage_Frame extends Base_Frame {
 
         // Panel bottom : Các nút: Làm mới, quay lại, thêm sản phẩm -----------------------------------------------
         JPanel pnlbottom = createPanelBottom();
-        btn_Add = createButton16("Thêm SP");
+        btn_Add = createButton16("Thêm sản phẩm");
+        btn_Add.setPreferredSize(new Dimension(160,35));
         btn_Refresh = createButton16("Làm mới");
         btn_Back =createButton16("Quay lại");
         pnlbottom.add(btn_Add);
@@ -74,7 +75,7 @@ public class Product_Manage_Frame extends Base_Frame {
         pnlcenter.add(pnl_center_top, BorderLayout.NORTH);
 
         // Panel Center_table-----------
-        String[] cols = new String[] { "ID","Tên SP", "Đơn vị", "Đơn giá", "Số lượng" };
+        String[] cols = new String[] { "ID","Sản phẩm", "Đơn vị", "Đơn giá", "Số lượng" };
         model = new DefaultTableModel(cols, 0) {
             @Override
             // Cột id không được sửa trên bảng

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class Import_Detail_Service {
 
-    // ======= Thêm chi tiết phiếu nhập và cập nhật kho =======
+    //  Thêm chi tiết phiếu nhập và cập nhật kho 
     public boolean insert(Import_Detail detail) {
         String insertSQL = """
                 INSERT INTO chitietphieunhap 
@@ -31,7 +31,7 @@ public class Import_Detail_Service {
                 psInsert.setDouble(5, detail.getGiaBan());
                 psInsert.executeUpdate();
 
-                // --- Xác nhận transaction ---
+                //  Xác nhận transaction 
                 conn.commit();
                 return true;
 
@@ -47,7 +47,7 @@ public class Import_Detail_Service {
         }
     }
 
-    // ======= Lấy danh sách chi tiết phiếu nhập theo ID phiếu =======
+    // Lấy danh sách chi tiết phiếu nhập theo ID phiếu
     public ArrayList<Import_Detail> getById(int idPhieuNhap) {
         ArrayList<Import_Detail> list = new ArrayList<>();
         String sql = """
