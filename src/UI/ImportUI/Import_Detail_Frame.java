@@ -30,7 +30,7 @@ public class Import_Detail_Frame extends Base_Frame {
         setSize(900, 580);
         setLocationRelativeTo(null);
 
-        // ======= NORTH - Tiêu đề =======
+        // NORTH - Tiêu đề 
         JPanel pnlNorth = new JPanel();
         pnlNorth.setBackground(background_color);
         JLabel lb_header = createLabel("CHI TIẾT PHIẾU NHẬP #" + idPhieuNhap);
@@ -38,18 +38,18 @@ public class Import_Detail_Frame extends Base_Frame {
         pnlNorth.add(lb_header);
         add(pnlNorth, BorderLayout.NORTH);
 
-        // ======= CENTER - Bảng dữ liệu =======
+        // CENTER - Bảng dữ liệu
         String[] columns = {"STT", "Tên sản phẩm", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
         modelTable = new DefaultTableModel(columns, 0);
         tb_ImportDetail = createTable(modelTable);
         JScrollPane scrollPane = createScrollPane(tb_ImportDetail);
         add(scrollPane, BorderLayout.CENTER);
 
-        // ======= SOUTH - Tổng tiền + Nút quay lại =======
+        // SOUTH - Tổng tiền + Nút quay lại
         JPanel pnlSouth = new JPanel(new BorderLayout());
         pnlSouth.setBackground(background_color);
 
-        // --- Tổng tiền ---
+        // Tổng tiền 
         JPanel pnlTotal = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 5));
         pnlTotal.setBackground(background_color);
         lb_TongTien = createLabel("Tổng tiền:");
@@ -59,7 +59,7 @@ public class Import_Detail_Frame extends Base_Frame {
         pnlTotal.add(lb_TongTien);
         pnlTotal.add(txt_TongTien);
 
-        // --- Nút quay lại ---
+        //Nút quay lại
         JPanel pnlButton = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 5));
         pnlButton.setBackground(background_color);
         btn_Back = createButton16("Quay lại");
@@ -69,16 +69,16 @@ public class Import_Detail_Frame extends Base_Frame {
         pnlSouth.add(pnlTotal, BorderLayout.EAST);
         add(pnlSouth, BorderLayout.SOUTH);
 
-        // ======= Sự kiện =======
+        //Sự kiện
         btn_Back.addActionListener(e -> {
             dispose();
         });
 
-        // ======= Load dữ liệu =======
+        // Load dữ liệu
         LoadData();
     }
 
-    // ======= Load dữ liệu theo id phiếu nhập =======
+    //  Load dữ liệu theo id phiếu nhập
     private void LoadData() {
         ArrayList<Import_Detail> list = detail_service.getById(idPhieuNhap);
         modelTable.setRowCount(0);
