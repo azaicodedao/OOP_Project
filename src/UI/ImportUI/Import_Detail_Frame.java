@@ -39,7 +39,7 @@ public class Import_Detail_Frame extends Base_Frame {
         add(pnlNorth, BorderLayout.NORTH);
 
         // CENTER - Bảng dữ liệu
-        String[] columns = {"STT", "Tên sản phẩm", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
+        String[] columns = {"STT", "Tên sản phẩm", "Số lượng", "Giá nhập", "Thành tiền"};
         modelTable = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -48,15 +48,12 @@ public class Import_Detail_Frame extends Base_Frame {
         };
 
         tb_ImportDetail = createTable(modelTable);
-        tb_ImportDetail.setRowHeight(25);
-        tb_ImportDetail.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-        tb_ImportDetail.getTableHeader().setBackground(new Color(0xE6EEF8));
-        tb_ImportDetail.getTableHeader().setForeground(Color.BLACK);
-        tb_ImportDetail.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        tb_ImportDetail.setGridColor(Color.LIGHT_GRAY);
-        tb_ImportDetail.setSelectionBackground(new Color(220, 235, 245));
+        tb_ImportDetail.getColumnModel().getColumn(0).setMaxWidth(40);
+        tb_ImportDetail.getColumnModel().getColumn(1).setMinWidth(200);
+        tb_ImportDetail.getColumnModel().getColumn(2).setMinWidth(70);
+        tb_ImportDetail.getColumnModel().getColumn(4).setMinWidth(150);
 
-        // === CĂN CHỈNH CỘT ===
+        // CĂN CHỈNH CỘT
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -68,10 +65,9 @@ public class Import_Detail_Frame extends Base_Frame {
         tb_ImportDetail.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
         tb_ImportDetail.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 
-        // Căn phải cho Giá nhập, Giá bán, Thành tiền
+        // Căn phải cho Giá nhập, Thành tiền
         tb_ImportDetail.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
         tb_ImportDetail.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
-        tb_ImportDetail.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);
 
         // Căn giữa tiêu đề cột
         ((DefaultTableCellRenderer) tb_ImportDetail.getTableHeader().getDefaultRenderer())
@@ -124,7 +120,6 @@ public class Import_Detail_Frame extends Base_Frame {
                     d.getTenSanPham(),
                     d.getSoluong(),
                     MoneyFormat.format(d.getGiaNhap()),
-                    MoneyFormat.format(d.getGiaBan()),
                     MoneyFormat.format(d.getThanhTien())
             });
             tongTien += d.getThanhTien();
