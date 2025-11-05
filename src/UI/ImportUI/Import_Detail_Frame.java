@@ -5,10 +5,10 @@ package UI.ImportUI;
 import Model.Import_Detail;
 import DAO.Service.ImportSEV.Import_Detail_Service;
 import UI.Base_Frame;
-import UI.MoneyFormat; //thêm để định dạng tiền
+import UI.MoneyFormat;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.*;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -30,7 +30,7 @@ public class Import_Detail_Frame extends Base_Frame {
         setSize(900, 580);
         setLocationRelativeTo(null);
 
-        // NORTH - Tiêu đề 
+        // NORTH - Tiêu đề
         JPanel pnlNorth = new JPanel();
         pnlNorth.setBackground(background_color);
         JLabel lb_header = createLabel("CHI TIẾT PHIẾU NHẬP #" + idPhieuNhap);
@@ -40,8 +40,43 @@ public class Import_Detail_Frame extends Base_Frame {
 
         // CENTER - Bảng dữ liệu
         String[] columns = {"STT", "Tên sản phẩm", "Số lượng", "Giá nhập", "Giá bán", "Thành tiền"};
-        modelTable = new DefaultTableModel(columns, 0);
+        modelTable = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
         tb_ImportDetail = createTable(modelTable);
+        tb_ImportDetail.setRowHeight(25);
+        tb_ImportDetail.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        tb_ImportDetail.getTableHeader().setBackground(new Color(0xE6EEF8));
+        tb_ImportDetail.getTableHeader().setForeground(Color.BLACK);
+        tb_ImportDetail.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        tb_ImportDetail.setGridColor(Color.LIGHT_GRAY);
+        tb_ImportDetail.setSelectionBackground(new Color(220, 235, 245));
+
+        // === CĂN CHỈNH CỘT ===
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+
+        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+        rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        // Căn giữa cho STT, Tên SP, Số lượng
+        tb_ImportDetail.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        tb_ImportDetail.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+        tb_ImportDetail.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+
+        // Căn phải cho Giá nhập, Giá bán, Thành tiền
+        tb_ImportDetail.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+        tb_ImportDetail.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
+        tb_ImportDetail.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);
+
+        // Căn giữa tiêu đề cột
+        ((DefaultTableCellRenderer) tb_ImportDetail.getTableHeader().getDefaultRenderer())
+                .setHorizontalAlignment(SwingConstants.CENTER);
+
         JScrollPane scrollPane = createScrollPane(tb_ImportDetail);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -49,7 +84,7 @@ public class Import_Detail_Frame extends Base_Frame {
         JPanel pnlSouth = new JPanel(new BorderLayout());
         pnlSouth.setBackground(background_color);
 
-        // Tổng tiền 
+        // Tổng tiền
         JPanel pnlTotal = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 5));
         pnlTotal.setBackground(background_color);
         lb_TongTien = createLabel("Tổng tiền:");
@@ -59,7 +94,7 @@ public class Import_Detail_Frame extends Base_Frame {
         pnlTotal.add(lb_TongTien);
         pnlTotal.add(txt_TongTien);
 
-        //Nút quay lại
+        // Nút quay lại
         JPanel pnlButton = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 5));
         pnlButton.setBackground(background_color);
         btn_Back = createButton16("Quay lại");
@@ -69,16 +104,14 @@ public class Import_Detail_Frame extends Base_Frame {
         pnlSouth.add(pnlTotal, BorderLayout.EAST);
         add(pnlSouth, BorderLayout.SOUTH);
 
-        //Sự kiện
-        btn_Back.addActionListener(e -> {
-            dispose();
-        });
+        // Sự kiện
+        btn_Back.addActionListener(e -> dispose());
 
         // Load dữ liệu
         LoadData();
     }
 
-    //  Load dữ liệu theo id phiếu nhập
+    // Load dữ liệu theo id phiếu nhập
     private void LoadData() {
         ArrayList<Import_Detail> list = detail_service.getById(idPhieuNhap);
         modelTable.setRowCount(0);
@@ -90,14 +123,14 @@ public class Import_Detail_Frame extends Base_Frame {
                     stt++,
                     d.getTenSanPham(),
                     d.getSoluong(),
-                    MoneyFormat.format(d.getGiaNhap()), // dùng MoneyFormat
+                    MoneyFormat.format(d.getGiaNhap()),
                     MoneyFormat.format(d.getGiaBan()),
                     MoneyFormat.format(d.getThanhTien())
             });
             tongTien += d.getThanhTien();
         }
 
-        txt_TongTien.setText(MoneyFormat.format(tongTien)); // định dạng tổng tiền
+        txt_TongTien.setText(MoneyFormat.format(tongTien));
     }
 
     public static void main(String[] args) {
