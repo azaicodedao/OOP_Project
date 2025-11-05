@@ -93,6 +93,10 @@ public class Invoice_Detail_Frame extends Base_Frame {
                 tb_invoice_detail.getColumnModel().getColumn(i).setCellRenderer(center_Renderer);
             }
         }
+        tb_invoice_detail.getColumnModel().getColumn(0).setMaxWidth(50);
+        tb_invoice_detail.getColumnModel().getColumn(1).setMinWidth(200);
+        tb_invoice_detail.getColumnModel().getColumn(2).setMinWidth(70);
+        tb_invoice_detail.getColumnModel().getColumn(4).setMinWidth(50);
 
         // Căn giữa và in đậm tiêu đề
         JTableHeader header = tb_invoice_detail.getTableHeader();
