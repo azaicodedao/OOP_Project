@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import UI.Base_Frame;
@@ -136,13 +137,9 @@ public class Import_List_Frame extends Base_Frame {
         java.util.Date fromUtilDate = fromDateChooser.getDate();
         java.util.Date toUtilDate = toDateChooser.getDate();
 
-        // Chuyển từ java.util.Date sang java.sql.Date
-        java.sql.Date fromSqlDate = new java.sql.Date(fromUtilDate.getTime());
-        java.sql.Date toSqlDate = new java.sql.Date(toUtilDate.getTime());
-
         // Chuyển sang LocalDate để format
-        LocalDate fromDate = fromSqlDate.toLocalDate();
-        LocalDate toDate = toSqlDate.toLocalDate();
+        LocalDateTime fromDate = fromUtilDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().atStartOfDay();
+        LocalDateTime toDate = toUtilDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().atTime(23, 59, 59);
 
         // Kiểm tra ngày bắt đầu không lớn hơn ngày kết thúc
         if (fromDate.isAfter(toDate)) {
@@ -152,7 +149,7 @@ public class Import_List_Frame extends Base_Frame {
         }
 
         // Format sang định dạng database (yyyy-MM-dd)
-        DateTimeFormatter dbFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter dbFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String fromDB = fromDate.format(dbFormatter);
         String toDB = toDate.format(dbFormatter);
 
