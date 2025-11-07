@@ -14,6 +14,9 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 //Nguyễn Văn Tiến
@@ -77,11 +80,13 @@ public class Product_Manage_Frame extends Base_Frame {
 
         // Panel Center_table-----------
         String[] cols = new String[] { "ID","Sản phẩm", "Đơn vị", "Đơn giá", "Số lượng" };
+        model = new DefaultTableModel(cols, 0);
         model = new DefaultTableModel(cols, 0) {
             @Override
             // Cột id không được sửa trên bảng
             public boolean isCellEditable(int row, int column) {
                 return column != 0 && column != 4;
+//                return false;
             }
         };
         tbProduct = createTable(model);
@@ -104,7 +109,7 @@ public class Product_Manage_Frame extends Base_Frame {
         // Cập nhật dữ liệu của bảng
         LoadTable();
 
-        // Sửa dữ liệu trực tiếp trên bảng
+//         Sửa dữ liệu trực tiếp trên bảng
         model.addTableModelListener(new TableModelListener() {
 
             @Override
@@ -115,6 +120,16 @@ public class Product_Manage_Frame extends Base_Frame {
                 }
             }
         });
+
+//        tbProduct.addMouseListener(new MouseAdapter() {
+//            public void mouseClicked(MouseEvent e) {
+//                if(e.getClickCount()==2 && tbProduct.getSelectedRow()!=-1){
+//                    int row = tbProduct.getSelectedRow();
+//                    int col = tbProduct.getSelectedColumn();
+//                    tbProduct.setValueAt("", row,col );
+//                }
+//            }
+//        });
 
         // Xử lý sự kiện -------------------------------------------------------
         btn_Add.addActionListener(e -> Add_Product());

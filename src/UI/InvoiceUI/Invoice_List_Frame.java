@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 public class
@@ -70,6 +71,7 @@ Invoice_List_Frame extends Base_Frame {
             }
         };
         table = createTable(model);
+//        table.setAutoCreateRowSorter(true);
         table.getColumnModel().getColumn(0).setCellRenderer(center_Renderer);
         table.getColumnModel().getColumn(1).setCellRenderer(right_Renderer);
         table.getColumnModel().getColumn(2).setCellRenderer(center_Renderer);
@@ -79,8 +81,10 @@ Invoice_List_Frame extends Base_Frame {
 
 //        JPanel bottom -------------------------------------------------------------------
         JPanel pnl_bottom = createPanelBottom();
+        JButton btn_Sort = createButton20("Sắp xếp");
         btn_Refresh = createButton20("Làm mới");
         btn_Back = createButton20 ("Quay lại");
+        pnl_bottom.add(btn_Sort);
         pnl_bottom.add(btn_Back);
         pnl_bottom.add(btn_Refresh);
         add(pnl_bottom, BorderLayout.SOUTH);
@@ -96,6 +100,7 @@ Invoice_List_Frame extends Base_Frame {
                 }
             }
         });
+        btn_Sort.addActionListener(e->SortPrice());
         btn_Search.addActionListener(e->SearchData());
         btn_Refresh.addActionListener(e -> LoadData());
         btn_Back.addActionListener(e -> Back());
@@ -158,6 +163,38 @@ Invoice_List_Frame extends Base_Frame {
                 JOptionPane.showMessageDialog(this,"Chưa có hóa đơn nào !");
                 model.setRowCount(10);
             }
+    }
+    private void SortPrice(){
+//        model.setRowCount(0);
+//        date_from.setDate(null);
+//        date_to.setDate(null);
+//        ArrayList<Invoice> invoices = invoice_service.getAll();
+//        Collections.sort(invoices,(a,b)->
+//                Double.compare(a.getTotal(), b.getTotal()));
+//        for (Invoice invoice : invoices) {
+//            model.addRow(new Object[]{
+//                    invoice.getId(),
+//                    MoneyFormat.format(invoice.getTotal()),
+//                    invoice.getDate()
+//            });
+//        }
+//        if(invoices.isEmpty()){
+//            JOptionPane.showMessageDialog(this,"Chưa có hóa đơn nào !");
+//            model.setRowCount(10);
+//        }
+        ArrayList<Object[]> row = new ArrayList<>();
+        for(int i = 0; i < model.getRowCount(); i++){
+            Object[] row_item = new Object[model.getColumnCount()];
+            for(int j = 0; j < model.getColumnCount(); j++){
+                row_item[j] = model.getValueAt(i, j);
+            }
+            row.add(row_item);
+        }
+        Collections.sort(row,(a,b)->Double.compare(Double.parseDouble(a[1].toString().replace("VNĐ","").replace(",","").trim()),Double.parseDouble(b[1].toString().replace("VNĐ","").replace(",","").trim())));
+        model.setRowCount(0);
+        for(int i = 0; i < row.size(); i++){
+            model.addRow(row.get(i));
+        }
     }
     private void ViewDetail(int id){
         new Invoice_Detail_Frame(id);
